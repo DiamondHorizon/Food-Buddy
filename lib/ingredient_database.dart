@@ -33,7 +33,7 @@ class IngredientDatabase {
     await db.execute('''
       CREATE TABLE Ingredients (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
+        name TEXT NOT NULL
       )
     ''');
 
@@ -47,5 +47,14 @@ class IngredientDatabase {
   Future<List<Map<String, dynamic>>> getIngredients() async {
     final db = await instance.database;
     return await db.query('Ingredients');
+  }
+
+  // Insert a new item into the database
+  Future<int> insertItem(String name) async {
+    final db = await instance.database;
+    return await db.insert(
+      'Ingredients',
+      {'name': name},
+    );
   }
 }

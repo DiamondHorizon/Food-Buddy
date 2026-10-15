@@ -37,8 +37,8 @@ class RecipeDatabase {
       CREATE TABLE Recipes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        type TEXT
-        meal TEXT
+        type TEXT,
+        meal TEXT,
         instructions TEXT NOT NULL
       )
     ''');

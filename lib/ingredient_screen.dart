@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'ingredient_database.dart';
-import 'recipe_database.dart';
 
 class IngredientScreen extends StatelessWidget {
   const IngredientScreen({super.key});
@@ -104,6 +103,43 @@ class _IngredientPageState extends State<IngredientPage> {
                   child: const Text('+'),
                 ),
               ],
+            ),
+            const SizedBox(height: 20),
+
+            Expanded(
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: IngredientDatabase.instance.getIngredients(),
+                builder: (context, snapshot) {
+                  // Check if waiting for a response from the database
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  
+                  // Check if the database is empty
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('You have no ingredients'));
+                  }
+
+                  final ingredients = snapshot.data!;
+
+                  // Build the scrolling list of ingreidents
+                  return ListView.builder(
+                    itemCount: ingredients.length,
+                    itemBuilder: (context, index) {
+                      // Grab the individual ingredient map at this specific index
+                      final ingredient = ingredients[index];
+
+                      // Return a row widget for each item
+                      return ListTile(
+                        title: Text(ingredient['name']), // Displays the ingredient name from the database
+                        leading: CircleAvatar(
+                          child: Text('${ingredient['id']}'), // Displays the row ID
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),

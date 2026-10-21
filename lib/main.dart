@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'ingredient_screen.dart';
+import 'recipe_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
@@ -21,5 +22,6 @@ import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
   }
   // Android and iOS need no special setup; they use native sqflite automatically.
 
-  runApp(const IngredientScreen());
+  // runApp(const IngredientScreen());
+  runApp(const RecipeScreen());
 }

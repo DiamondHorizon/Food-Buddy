@@ -57,4 +57,13 @@ class RecipeDatabase {
     final db = await instance.database;
     return await db.query('Recipes');
   }
+
+  // Insert a new item into the database
+  Future<int> insertItem(String name, String type, String meal, String instructions) async {
+    final db = await instance.database;
+    return await db.insert(
+      'Recipes',
+      {'name': name, 'type': type, 'meal': meal, 'instructions': instructions},
+    );
+  }
 }

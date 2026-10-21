@@ -81,7 +81,7 @@ class _IngredientPageState extends State<IngredientPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Interactive Sqflite Tutorial')),
+      appBar: AppBar(title: const Text('Ingredients')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

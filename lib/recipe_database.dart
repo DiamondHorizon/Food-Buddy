@@ -39,7 +39,15 @@ class RecipeDatabase {
         name TEXT NOT NULL,
         type TEXT,
         meal TEXT,
-        instructions TEXT NOT NULL
+        instructions TEXT NOT NULL,
+        dietRestriction TEXT,
+        duration INTEGER,
+        calories REAL,
+        protein REAL,
+        carbs REAL,
+        fat REAL,
+        difficulty TEXT,
+        servingSize INTEGER NOT NULL
       )
     ''');
 
@@ -48,7 +56,15 @@ class RecipeDatabase {
       'name': 'Example Recipe',
       'type': 'Entree',
       'meal': 'Breakfast',
-      'instructions': 'Cook the things'
+      'instructions': 'Cook the things',
+      'dietRestriction': 'None',
+      'duration': 30,
+      'calories': 500.0,
+      'protein': 20.0,
+      'carbs': 60.0,
+      'fat': 10.0,
+      'difficulty': 'Easy',
+      'servingSize': 4
     });
   }
 

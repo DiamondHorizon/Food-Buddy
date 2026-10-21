@@ -50,6 +50,13 @@ class RecipeDatabase {
       'meal': 'Breakfast',
       'instructions': 'Cook the things'
     });
+
+    await db.insert('Recipes', {
+      'name': 'Rice',
+      'type': 'Entree',
+      'meal': 'Dinner',
+      'instructions': 'Add 1 cup rice to rice cooker, add .5t salt, 1T sugar, and 2T rice wine vinegar per cup. 1.3 cups water. Enjoy!~'
+    });
   }
 
   // Fetch all recipes in the database

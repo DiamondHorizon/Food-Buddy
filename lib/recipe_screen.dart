@@ -172,11 +172,24 @@ class _RecipePageState extends State<RecipePage> {
                       final recipe = recipes[index];
 
                       // Return a row widget for each item
-                      return ListTile(
+                      return ExpansionTile(
                         title: Text(recipe['name']), // Displays the recipe name from the database
                         leading: CircleAvatar(
                           child: Text('${recipe['id']}'), // Displays the row ID
                         ),
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Text('${recipe['meal']} : ${recipe['type']}'),
+                                const SizedBox(height: 8),
+                                Text('${recipe['instructions']}'),
+                              ],
+                            ),
+                          )
+                        ],
                       );
                     },
                   );

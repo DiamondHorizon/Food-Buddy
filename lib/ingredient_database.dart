@@ -20,8 +20,9 @@ class IngredientDatabase {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB, // This triggers only on first app launch
+      onUpgrade: _upgradeDB,
     );
   }
 
@@ -33,7 +34,9 @@ class IngredientDatabase {
     await db.execute('''
       CREATE TABLE Ingredients (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL
+        name TEXT NOT NULL,
+        area TEXT NOT NULL DEFAULT 'pantry',
+        quantity TEXT
       )
     ''');
 
@@ -43,6 +46,13 @@ class IngredientDatabase {
     });
   }
 
+  Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute("ALTER TABLE Ingredients ADD COLUMN area TEXT NOT NULL DEFAULT 'pantry'");
+      await db.execute('ALTER TABLE Ingredients ADD COLUMN quantity TEXT');
+    }
+  }
+
   // Fetch all ingredients in the database
   Future<List<Map<String, dynamic>>> getIngredients() async {
     final db = await instance.database;
@@ -50,11 +60,16 @@ class IngredientDatabase {
   }
 
   // Insert a new item into the database
-  Future<int> insertItem(String name) async {
+  Future<int> insertItem(String name, {String area = 'pantry', String quantity = ''}) async {
     final db = await instance.database;
     return await db.insert(
       'Ingredients',
-      {'name': name},
+      {'name': name, 'area': area, 'quantity': quantity},
     );
+  }
+
+  Future<int> deleteItem(int id) async {
+    final db = await instance.database;
+    return await db.delete('Ingredients', where: 'id = ?', whereArgs: [id]);
   }
 }

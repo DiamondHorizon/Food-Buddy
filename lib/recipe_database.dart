@@ -20,8 +20,9 @@ class RecipeDatabase {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB, // This triggers only on first app launch
+      onUpgrade: _upgradeDB,
     );
   }
 
@@ -40,6 +41,7 @@ class RecipeDatabase {
         type TEXT,
         meal TEXT,
         instructions TEXT NOT NULL,
+        ingredients TEXT,
         dietRestriction TEXT,
         duration INTEGER,
         calories REAL,
@@ -57,6 +59,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Breakfast',
       'instructions': 'Cook the things',
+      'ingredients': 'egg, milk, butter',
       'dietRestriction': 'None',
       'duration': 30,
       'calories': 500.0,
@@ -68,6 +71,12 @@ class RecipeDatabase {
     });
   }
 
+  Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE Recipes ADD COLUMN ingredients TEXT');
+    }
+  }
+
   // Fetch all recipes in the database
   Future<List<Map<String, dynamic>>> getRecipes() async {
     final db = await instance.database;
@@ -75,11 +84,19 @@ class RecipeDatabase {
   }
 
   // Insert a new item into the database
-  Future<int> insertItem(String name, String type, String meal, String instructions) async {
+  Future<int> insertItem(String name, String type, String meal, String instructions,
+      {String ingredients = '', int servingSize = 1}) async {
     final db = await instance.database;
     return await db.insert(
       'Recipes',
-      {'name': name, 'type': type, 'meal': meal, 'instructions': instructions},
+      {
+        'name': name,
+        'type': type,
+        'meal': meal,
+        'instructions': instructions,
+        'ingredients': ingredients,
+        'servingSize': servingSize,
+      },
     );
   }
 }

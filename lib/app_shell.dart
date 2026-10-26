@@ -343,7 +343,7 @@ class _SidebarItem extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, c) => Row(
               children: [
-                SizedBox(width: 48, child: Icon(tab.icon, color: fg, size: 22)),
+                SizedBox(width: 38, child: Icon(tab.icon, color: fg, size: 22)),
                 if (c.maxWidth > 120)
                   Expanded(
                     child: Text(
@@ -388,7 +388,7 @@ class _ThemeToggle extends StatelessWidget {
             builder: (context, c) => Row(
               children: [
                 SizedBox(
-                  width: 48,
+                  width: 38,
                   child: Icon(
                     darkMode ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
                     color: fg,

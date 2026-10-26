@@ -69,6 +69,21 @@ class RecipeDatabase {
       'difficulty': 'Easy',
       'servingSize': 4
     });
+    await db.insert('Recipes', {
+      'name': 'Rice',
+      'type': 'Entree',
+      'meal': 'Dinner',
+      'instructions': 'Mix 1 Cup Rice with 2 T Rice Wine Vinegar, 0.5 T Sugar, and 0.25 T Salt in rice cooker with 1.25 cups water per cup rice. ',
+      'ingredients': 'Rice, Rice Wine Vinegar, Sugar, Salt',
+      'dietRestriction': 'None',
+      'duration': 30,
+      'calories': 500.0,
+      'protein': 20.0,
+      'carbs': 60.0,
+      'fat': 10.0,
+      'difficulty': 'Easy',
+      'servingSize': 1
+    });
   }
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {

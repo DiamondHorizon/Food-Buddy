@@ -941,6 +941,66 @@ class RecipeDatabase {
       'difficulty': 'Easy',
       'servingSize': 1
     });
+    await db.insert('Recipes', {
+      'name': 'Ground Beef',
+      'type': 'Entree',
+      'meal': 'Dinner',
+      'instructions': 'Raise pan to medium heat. Cover bottom of pan in oil. Cook until meat is browned with seasonings as desired. We reccomend Soy Sauce, Mirin, and Garlic Powder/minced Garlic. ',
+      'ingredients': 'Ground Beef',
+      'dietRestriction': 'None',
+      'duration': 5,
+      'calories': 500.0,
+      'protein': 20.0,
+      'carbs': 60.0,
+      'fat': 10.0,
+      'difficulty': 'Easy',
+      'servingSize': 1
+    });
+    await db.insert('Recipes', {
+      'name': 'College Ramen',
+      'type': 'Entree',
+      'meal': 'Dinner',
+      'instructions': 'Boil water in pot according to instructions on Ramen packet. Add 1t Chili oil, 1T honey, 2 Eggs, and ramen seasoning',
+      'ingredients': 'Chili oil, Ramen Packet, Eggs, Honey',
+      'dietRestriction': 'None',
+      'duration': 30,
+      'calories': 500.0,
+      'protein': 20.0,
+      'carbs': 60.0,
+      'fat': 10.0,
+      'difficulty': 'Easy',
+      'servingSize': 4
+    });
+    await db.insert('Recipes', {
+      'name': 'Soft Boiled Egg',
+      'type': 'Appetizer',
+      'meal': 'Breakfast',
+      'instructions': 'Boil eggs for 6.5 minutes in pot of boiling water with 1t Salt and 1t Vinegar. Immediately remove and place in ice water. ',
+      'ingredients': 'egg',
+      'dietRestriction': 'None',
+      'duration': 30,
+      'calories': 500.0,
+      'protein': 20.0,
+      'carbs': 60.0,
+      'fat': 10.0,
+      'difficulty': 'Easy',
+      'servingSize': 4
+    });
+    await db.insert('Recipes', {
+      'name': 'Tuna',
+      'type': 'Entree',
+      'meal': 'Breakfast',
+      'instructions': 'Prepare Marinade: 2 cups Soy Sauce, 1 T Mirin, 1 T Sesame Oil, 2 cloves garlic finely minced. Mix all together and let sit in fridge in container large enough to hold tuna steaks. Cook Tuna briefly in pan with small amount of Olive Oil or Sesame Oil, enough to brown insides but not cook through. Marinate in container for 2-24 hours. Serve with Rice or eat plain. ',
+      'ingredients': 'Soy Sauce, Mirin, Sesame Oil, Garlic, Green Onion, Tuna Steaks',
+      'dietRestriction': 'None',
+      'duration': 30,
+      'calories': 500.0,
+      'protein': 20.0,
+      'carbs': 60.0,
+      'fat': 10.0,
+      'difficulty': 'Medium',
+      'servingSize': 4
+    });
   }
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {

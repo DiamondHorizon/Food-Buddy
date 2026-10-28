@@ -62,14 +62,16 @@ class Ingredient {
   final int? id;
   final String name;
   final String quantity;
+  final String expiration;
   final StorageArea area;
 
-  const Ingredient({this.id, required this.name, this.quantity = '', required this.area});
+  const Ingredient({this.id, required this.name, this.quantity = '', this.expiration = '', required this.area});
 
   factory Ingredient.fromMap(Map<String, dynamic> row) => Ingredient(
         id: row['id'] as int?,
         name: (row['name'] as String).trim().toLowerCase(),
         quantity: (row['quantity'] as String?) ?? '',
+        expiration: (row['expiration'] as String?) ?? '',
         area: storageAreaFrom(row['area']),
       );
 }
@@ -135,6 +137,7 @@ class AppState extends ChangeNotifier {
       item.name,
       area: item.area.name,
       quantity: item.quantity,
+      expiration: item.expiration,
     );
     await load();
   }

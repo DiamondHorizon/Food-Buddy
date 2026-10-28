@@ -109,7 +109,7 @@ class StorageSection extends StatelessWidget {
         : Column(
             children: [
               for (final item in items)
-                ListTile(
+                ExpansionTile(
                   dense: true,
                   title: Text(item.name,
                       style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15)),
@@ -119,6 +119,19 @@ class StorageSection extends StatelessWidget {
                     icon: const Icon(Icons.close, size: 18),
                     onPressed: () => onRemove(item),
                   ),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text('Expiration: ${item.expiration}'),
+                          const SizedBox(height: 8),
+                          const Text('Edit quantity function goes here'),
+                        ],
+                      )
+                    )
+                  ],
                 ),
             ],
           );
@@ -184,6 +197,7 @@ class AddIngredientDialog extends StatefulWidget {
 class _AddIngredientDialogState extends State<AddIngredientDialog> {
   final _name = TextEditingController();
   final _qty = TextEditingController();
+  final _exp = TextEditingController();
   late StorageArea _area = widget.initialArea;
   String? _error;
 
@@ -193,13 +207,14 @@ class _AddIngredientDialogState extends State<AddIngredientDialog> {
       setState(() => _error = 'Enter an ingredient name.');
       return;
     }
-    Navigator.pop(context, Ingredient(name: name, quantity: _qty.text.trim(), area: _area));
+    Navigator.pop(context, Ingredient(name: name, quantity: _qty.text.trim(), expiration: _exp.text.trim(), area: _area));
   }
 
   @override
   void dispose() {
     _name.dispose();
     _qty.dispose();
+    _exp.dispose();
     super.dispose();
   }
 
@@ -225,6 +240,15 @@ class _AddIngredientDialogState extends State<AddIngredientDialog> {
               decoration: const InputDecoration(
                 labelText: 'Quantity (optional)',
                 hintText: 'e.g. 2 cans, 500 g',
+              ),
+              onSubmitted: (_) => _submit(),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _exp,
+              decoration: const InputDecoration(
+                labelText: 'Expiration Date (optional)',
+                hintText: 'e.g. Nov 9, 2026',
               ),
               onSubmitted: (_) => _submit(),
             ),

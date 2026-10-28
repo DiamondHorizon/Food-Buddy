@@ -20,7 +20,7 @@ class RecipeDatabase {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB, // This triggers only on first app launch
       onUpgrade: _upgradeDB,
     );
@@ -53,14 +53,17 @@ class RecipeDatabase {
       )
     ''');
 
-    // Insert pre-populated recipes
-// Source: BBC Good Food (bbcgoodfood.com). Nutrition values are per serving as listed on each recipe page.
-// duration = prep + cook time in minutes. difficulty: Easy / Medium ("More effort") / Hard ("A challenge").
-// type: Appetizer, Entree, Dessert, Drink. meal: Breakfast, Lunch, Dinner.
-// Paste these inside _createDB, after the CREATE TABLE statement.
+    await _insertStarterRecipes(db);
+  }
+
+  // Insert starter recipes (runs on create and on upgrade)
+  Future _insertStarterRecipes(Database db) async {
+  // Source: BBC Good Food (bbcgoodfood.com). Nutrition values are per serving as listed on each recipe page.
+  // duration = prep + cook time in minutes. difficulty: Easy / Medium ("More effort") / Hard ("A challenge").
+  // type: Appetizer, Entree, Dessert, Drink. meal: Breakfast, Lunch, Dinner.
 
     // 1. Fluffy American pancakes - https://www.bbcgoodfood.com/recipes/american-pancakes
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Fluffy American pancakes',
       'type': 'Entree',
       'meal': 'Breakfast',
@@ -77,7 +80,7 @@ class RecipeDatabase {
     });
 
     // 2. The breakfast club - https://www.bbcgoodfood.com/recipes/the-breakfast-club
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'The breakfast club',
       'type': 'Entree',
       'meal': 'Breakfast',
@@ -94,7 +97,7 @@ class RecipeDatabase {
     });
 
     // 3. Pain au chocolat - https://www.bbcgoodfood.com/recipes/pain-au-chocolat
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Pain au chocolat',
       'type': 'Entree',
       'meal': 'Breakfast',
@@ -111,7 +114,7 @@ class RecipeDatabase {
     });
 
     // 4. Leek & kale hash with sage fried eggs - https://www.bbcgoodfood.com/recipes/leek-kale-hash-with-sage-fried-eggs
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Leek & kale hash with sage fried eggs',
       'type': 'Entree',
       'meal': 'Breakfast',
@@ -128,7 +131,7 @@ class RecipeDatabase {
     });
 
     // 5. Air fryer omelette - https://www.bbcgoodfood.com/recipes/air-fryer-omelette
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Air fryer omelette',
       'type': 'Entree',
       'meal': 'Breakfast',
@@ -145,7 +148,7 @@ class RecipeDatabase {
     });
 
     // 6. Baby pancakes - https://www.bbcgoodfood.com/recipes/baby-pancakes
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Baby pancakes',
       'type': 'Entree',
       'meal': 'Breakfast',
@@ -162,7 +165,7 @@ class RecipeDatabase {
     });
 
     // 7. Protein porridge - https://www.bbcgoodfood.com/recipes/protein-porridge
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Protein porridge',
       'type': 'Entree',
       'meal': 'Breakfast',
@@ -179,7 +182,7 @@ class RecipeDatabase {
     });
 
     // 8. Cheese omelette - https://www.bbcgoodfood.com/recipes/cheese-omelette
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Cheese omelette',
       'type': 'Entree',
       'meal': 'Breakfast',
@@ -196,7 +199,7 @@ class RecipeDatabase {
     });
 
     // 9. Eggs Florentine - https://www.bbcgoodfood.com/recipes/eggs-florentine
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Eggs Florentine',
       'type': 'Entree',
       'meal': 'Breakfast',
@@ -213,7 +216,7 @@ class RecipeDatabase {
     });
 
     // 10. Spicy Bloody Mary eggs with crunchy croutons - https://www.bbcgoodfood.com/recipes/spicy-bloody-mary-eggs-with-crunchy-croutons
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Spicy Bloody Mary eggs with crunchy croutons',
       'type': 'Entree',
       'meal': 'Breakfast',
@@ -230,7 +233,7 @@ class RecipeDatabase {
     });
 
     // 11. Pan con tomate - https://www.bbcgoodfood.com/recipes/pan-con-tomate
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Pan con tomate',
       'type': 'Entree',
       'meal': 'Lunch',
@@ -247,7 +250,7 @@ class RecipeDatabase {
     });
 
     // 12. Chicken & tzatziki wraps - https://www.bbcgoodfood.com/recipes/chicken-tzatziki-wraps
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Chicken & tzatziki wraps',
       'type': 'Entree',
       'meal': 'Lunch',
@@ -264,7 +267,7 @@ class RecipeDatabase {
     });
 
     // 13. Spiced carrot & lentil soup - https://www.bbcgoodfood.com/recipes/spiced-carrot-lentil-soup
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Spiced carrot & lentil soup',
       'type': 'Entree',
       'meal': 'Lunch',
@@ -281,7 +284,7 @@ class RecipeDatabase {
     });
 
     // 14. Mexican bean soup with guacamole - https://www.bbcgoodfood.com/recipes/mexican-bean-soup-guacamole
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Mexican bean soup with guacamole',
       'type': 'Entree',
       'meal': 'Lunch',
@@ -298,7 +301,7 @@ class RecipeDatabase {
     });
 
     // 15. Chicken satay salad - https://www.bbcgoodfood.com/recipes/chicken-satay-salad
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Chicken satay salad',
       'type': 'Entree',
       'meal': 'Lunch',
@@ -315,7 +318,7 @@ class RecipeDatabase {
     });
 
     // 16. Spiced lentil & butternut squash soup - https://www.bbcgoodfood.com/recipes/spiced-lentil-butternut-squash-soup
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Spiced lentil & butternut squash soup',
       'type': 'Entree',
       'meal': 'Lunch',
@@ -332,7 +335,7 @@ class RecipeDatabase {
     });
 
     // 17. Vegan chickpea curry jacket potatoes - https://www.bbcgoodfood.com/recipes/vegan-chickpea-curry-jacket-potato
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Vegan chickpea curry jacket potatoes',
       'type': 'Entree',
       'meal': 'Lunch',
@@ -349,7 +352,7 @@ class RecipeDatabase {
     });
 
     // 18. Kidney bean curry - https://www.bbcgoodfood.com/recipes/kidney-bean-curry
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Kidney bean curry',
       'type': 'Entree',
       'meal': 'Lunch',
@@ -366,7 +369,7 @@ class RecipeDatabase {
     });
 
     // 19. Courgette soup - https://www.bbcgoodfood.com/recipes/courgette-potato-cheddar-soup
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Courgette soup',
       'type': 'Entree',
       'meal': 'Lunch',
@@ -383,7 +386,7 @@ class RecipeDatabase {
     });
 
     // 20. Burrito bowl with chipotle black beans - https://www.bbcgoodfood.com/recipes/burrito-bowl-chipotle-black-beans
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Burrito bowl with chipotle black beans',
       'type': 'Entree',
       'meal': 'Lunch',
@@ -400,7 +403,7 @@ class RecipeDatabase {
     });
 
     // 21. Chicken pasta bake - https://www.bbcgoodfood.com/recipes/chicken-pasta-bake
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Chicken pasta bake',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -417,7 +420,7 @@ class RecipeDatabase {
     });
 
     // 22. Easy chicken curry - https://www.bbcgoodfood.com/recipes/easy-chicken-curry
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Easy chicken curry',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -434,7 +437,7 @@ class RecipeDatabase {
     });
 
     // 23. Sausage ragu - https://www.bbcgoodfood.com/recipes/sausage-ragu
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Sausage ragu',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -451,7 +454,7 @@ class RecipeDatabase {
     });
 
     // 24. Creamy pesto & kale pasta - https://www.bbcgoodfood.com/recipes/creamy-pesto-kale-pasta
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Creamy pesto & kale pasta',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -468,7 +471,7 @@ class RecipeDatabase {
     });
 
     // 25. Fish pie mac ’n’ cheese - https://www.bbcgoodfood.com/recipes/fish-pie-mac-n-cheese
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Fish pie mac ’n’ cheese',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -485,7 +488,7 @@ class RecipeDatabase {
     });
 
     // 26. Speedy lentil coconut curry - https://www.bbcgoodfood.com/recipes/speedy-lentil-coconut-curry
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Speedy lentil coconut curry',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -502,7 +505,7 @@ class RecipeDatabase {
     });
 
     // 27. Fajita-style pasta - https://www.bbcgoodfood.com/recipes/fajita-style-pasta
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Fajita-style pasta',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -519,7 +522,7 @@ class RecipeDatabase {
     });
 
     // 28. Creamy garlic pasta - https://www.bbcgoodfood.com/recipes/creamy-garlic-pasta
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Creamy garlic pasta',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -536,7 +539,7 @@ class RecipeDatabase {
     });
 
     // 29. Meatball black bean chilli - https://www.bbcgoodfood.com/recipes/meatball-black-bean-chilli
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Meatball black bean chilli',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -553,7 +556,7 @@ class RecipeDatabase {
     });
 
     // 30. Creamy salmon, leek & potato traybake - https://www.bbcgoodfood.com/recipes/creamy-salmon-leek-potato-traybake
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Creamy salmon, leek & potato traybake',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -570,7 +573,7 @@ class RecipeDatabase {
     });
 
     // 31. Spicy chickpea stew - https://www.bbcgoodfood.com/recipes/spicy-chickpea-stew
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Spicy chickpea stew',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -587,7 +590,7 @@ class RecipeDatabase {
     });
 
     // 32. Veggie sausage casserole - https://www.bbcgoodfood.com/recipes/veggie-sausage-casserole
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Veggie sausage casserole',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -604,7 +607,7 @@ class RecipeDatabase {
     });
 
     // 33. Baked camembert - https://www.bbcgoodfood.com/recipes/baked-camembert
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Baked camembert',
       'type': 'Appetizer',
       'meal': 'Dinner',
@@ -621,7 +624,7 @@ class RecipeDatabase {
     });
 
     // 34. Creamy mushroom soup - https://www.bbcgoodfood.com/recipes/creamy-mushroom-soup
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Creamy mushroom soup',
       'type': 'Appetizer',
       'meal': 'Dinner',
@@ -638,7 +641,7 @@ class RecipeDatabase {
     });
 
     // 35. Baked feta with sesame & honey - https://www.bbcgoodfood.com/recipes/baked-feta-sesame-honey
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Baked feta with sesame & honey',
       'type': 'Appetizer',
       'meal': 'Dinner',
@@ -655,7 +658,7 @@ class RecipeDatabase {
     });
 
     // 36. Sarmale (Romanian cabbage rolls) - https://www.bbcgoodfood.com/recipes/sarmale-romanian-cabbage-rolls
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Sarmale (Romanian cabbage rolls)',
       'type': 'Appetizer',
       'meal': 'Dinner',
@@ -672,7 +675,7 @@ class RecipeDatabase {
     });
 
     // 37. Luxury hummus - https://www.bbcgoodfood.com/recipes/luxury-houmous
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Luxury hummus',
       'type': 'Appetizer',
       'meal': 'Dinner',
@@ -689,7 +692,7 @@ class RecipeDatabase {
     });
 
     // 38. Cured salmon with prawns, pickled salad & dill lime crème fraîche - https://www.bbcgoodfood.com/recipes/asian-cured-salmon-prawns-pickled-salad-dill-lime-creme-fraiche
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Cured salmon with prawns, pickled salad & dill lime crème fraîche',
       'type': 'Appetizer',
       'meal': 'Dinner',
@@ -706,7 +709,7 @@ class RecipeDatabase {
     });
 
     // 39. Easy chocolate molten cakes - https://www.bbcgoodfood.com/recipes/easy-chocolate-molten-cakes
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Easy chocolate molten cakes',
       'type': 'Dessert',
       'meal': 'Dinner',
@@ -723,7 +726,7 @@ class RecipeDatabase {
     });
 
     // 40. Biscoff cheesecake - https://www.bbcgoodfood.com/recipes/biscoff-cheesecake
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Biscoff cheesecake',
       'type': 'Dessert',
       'meal': 'Dinner',
@@ -740,7 +743,7 @@ class RecipeDatabase {
     });
 
     // 41. Chocolate tiffin - https://www.bbcgoodfood.com/recipes/chocolate-tiffin
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Chocolate tiffin',
       'type': 'Dessert',
       'meal': 'Dinner',
@@ -757,7 +760,7 @@ class RecipeDatabase {
     });
 
     // 42. White chocolate cheesecake - https://www.bbcgoodfood.com/recipes/white-chocolate-cheesecake
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'White chocolate cheesecake',
       'type': 'Dessert',
       'meal': 'Dinner',
@@ -774,7 +777,7 @@ class RecipeDatabase {
     });
 
     // 43. Lemon sponge cake - https://www.bbcgoodfood.com/recipes/lemon-sponge
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Lemon sponge cake',
       'type': 'Dessert',
       'meal': 'Dinner',
@@ -791,7 +794,7 @@ class RecipeDatabase {
     });
 
     // 44. Vanilla panna cotta - https://www.bbcgoodfood.com/recipes/vanilla-panna-cotta
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Vanilla panna cotta',
       'type': 'Dessert',
       'meal': 'Dinner',
@@ -808,7 +811,7 @@ class RecipeDatabase {
     });
 
     // 45. Easy cornflake tart - https://www.bbcgoodfood.com/recipes/easy-cornflake-tart
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Easy cornflake tart',
       'type': 'Dessert',
       'meal': 'Dinner',
@@ -825,7 +828,7 @@ class RecipeDatabase {
     });
 
     // 46. Two-minute breakfast smoothie - https://www.bbcgoodfood.com/recipes/two-minute-breakfast-smoothie
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Two-minute breakfast smoothie',
       'type': 'Drink',
       'meal': 'Breakfast',
@@ -842,7 +845,7 @@ class RecipeDatabase {
     });
 
     // 47. Breakfast smoothie - https://www.bbcgoodfood.com/recipes/breakfast-smoothie
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Breakfast smoothie',
       'type': 'Drink',
       'meal': 'Breakfast',
@@ -859,7 +862,7 @@ class RecipeDatabase {
     });
 
     // 48. Green breakfast smoothie - https://www.bbcgoodfood.com/recipes/green-breakfast-smoothie
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Green breakfast smoothie',
       'type': 'Drink',
       'meal': 'Breakfast',
@@ -876,7 +879,7 @@ class RecipeDatabase {
     });
 
     // 49. Strawberry smoothie - https://www.bbcgoodfood.com/recipes/strawberry-smoothie
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Strawberry smoothie',
       'type': 'Drink',
       'meal': 'Breakfast',
@@ -893,7 +896,7 @@ class RecipeDatabase {
     });
 
     // 50. Breakfast super-shake - https://www.bbcgoodfood.com/recipes/breakfast-super-shake
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Breakfast super-shake',
       'type': 'Drink',
       'meal': 'Breakfast',
@@ -909,24 +912,7 @@ class RecipeDatabase {
       'servingSize': 1
     });
 
-
-
-    await db.insert('Recipes', {
-      'name': 'Example Recipe',
-      'type': 'Entree',
-      'meal': 'Breakfast',
-      'instructions': 'Cook the things',
-      'ingredients': 'egg, milk, butter',
-      'dietRestriction': 'None',
-      'duration': 30,
-      'calories': 500.0,
-      'protein': 20.0,
-      'carbs': 60.0,
-      'fat': 10.0,
-      'difficulty': 'Easy',
-      'servingSize': 4
-    });
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Rice',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -946,6 +932,18 @@ class RecipeDatabase {
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute('ALTER TABLE Recipes ADD COLUMN ingredients TEXT');
+    }
+    if (oldVersion < 3) {
+      await _insertStarterRecipes(db);
+    }
+  }
+
+  // Insert a recipe only if its name isn't already in the database
+  Future _insertIfMissing(Database db, Map<String, Object?> recipe) async {
+    final existing = await db.query('Recipes',
+        columns: ['id'], where: 'name = ?', whereArgs: [recipe['name']], limit: 1);
+    if (existing.isEmpty) {
+      await db.insert('Recipes', recipe);
     }
   }
 

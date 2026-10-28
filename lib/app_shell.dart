@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'app_state.dart';
 import 'app_theme.dart';
-import 'pages/account_page.dart';
+import 'pages/preferences.dart';
 import 'pages/inventory_page.dart';
 import 'pages/recipes_page.dart';
 import 'platform.dart';
@@ -45,7 +45,7 @@ const appTabs = [
     darkBg: AppColors.recipesBgDark,
   ),
   AppTab(
-    label: 'Account',
+    label: 'Preferences',
     icon: Icons.person_outline,
     accent: AppColors.accountAccent,
     lightBg: AppColors.accountBg,

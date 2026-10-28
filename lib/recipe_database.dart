@@ -927,7 +927,7 @@ class RecipeDatabase {
       'difficulty': 'Easy',
       'servingSize': 1
     });
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Ground Beef',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -942,7 +942,7 @@ class RecipeDatabase {
       'difficulty': 'Easy',
       'servingSize': 1
     });
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'College Ramen',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -957,7 +957,7 @@ class RecipeDatabase {
       'difficulty': 'Easy',
       'servingSize': 4
     });
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Soft Boiled Egg',
       'type': 'Appetizer',
       'meal': 'Breakfast',
@@ -972,7 +972,7 @@ class RecipeDatabase {
       'difficulty': 'Easy',
       'servingSize': 4
     });
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Tuna',
       'type': 'Entree',
       'meal': 'Breakfast',

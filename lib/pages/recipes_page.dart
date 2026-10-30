@@ -16,6 +16,7 @@ extension on _SearchBy {
   };
     // input for ingredients: quantity, measurement + custom unit, and ingredient, ingredient notes (large clove, quality type)
     // dessert should have its own category, two different fields can get confusing
+    //image upload to and personal 
   String get hint => switch (this) {
     _SearchBy.name => 'Search by recipe name',
     _SearchBy.ingredient => 'e.g. egg, milk',

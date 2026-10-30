@@ -11,7 +11,7 @@ extension on _SearchBy {
   String get label => switch (this) {
     _SearchBy.name => 'Name',
     _SearchBy.ingredient => 'Ingredient',
-    _SearchBy.servings => 'Servings',
+    _SearchBy.servings => 'Servings', // TODO: implement only numbers foolproofing, advanced filtering (protein, calorie, date night approved)
   };
 
   String get hint => switch (this) {

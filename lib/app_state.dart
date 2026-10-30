@@ -83,6 +83,11 @@ class Recipe {
   final MealType meal;
   final String instructions;
   final List<String> ingredients;
+  final int? duration;
+  final int? servingSize;
+  final String difficulty;
+  final bool favorite;
+  final bool hidden;
 
   const Recipe({
     this.id,
@@ -91,6 +96,11 @@ class Recipe {
     required this.meal,
     this.instructions = '',
     required this.ingredients,
+    this.duration,
+    this.servingSize,
+    this.difficulty = '',
+    this.favorite = false,
+    this.hidden = false,
   });
 
   factory Recipe.fromMap(Map<String, dynamic> row) => Recipe(
@@ -104,6 +114,11 @@ class Recipe {
             .map((s) => s.trim().toLowerCase())
             .where((s) => s.isNotEmpty)
             .toList(),
+        duration: (row['duration'] as num?)?.toInt(),
+        servingSize: (row['servingSize'] as num?)?.toInt(),
+        difficulty: (row['difficulty'] as String?) ?? '',
+        favorite: row['favorite'] == 1,
+        hidden: row['hidden'] == 1,
       );
 }
 
@@ -153,6 +168,18 @@ class AppState extends ChangeNotifier {
       r.name, r.type, r.meal.label, r.instructions,
       ingredients: r.ingredients.join(', '),
     );
+    await load();
+  }
+
+  Future<void> toggleFavorite(Recipe r) async {
+    if (r.id == null) return;
+    await RecipeDatabase.instance.setFavorite(r.id!, !r.favorite);
+    await load();
+  }
+
+  Future<void> toggleHidden(Recipe r) async {
+    if (r.id == null) return;
+    await RecipeDatabase.instance.setHidden(r.id!, !r.hidden);
     await load();
   }
 

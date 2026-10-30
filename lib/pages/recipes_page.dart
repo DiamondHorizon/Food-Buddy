@@ -14,6 +14,7 @@ class RecipesPage extends StatefulWidget {
 
 class _RecipesPageState extends State<RecipesPage> {
   final Set<MealType> _filters = {};
+  bool _showHidden = false;
 
   Future<void> _openAddDialog() async {
     final recipe = await showDialog<Recipe>(
@@ -21,6 +22,17 @@ class _RecipesPageState extends State<RecipesPage> {
       builder: (_) => const AddRecipeDialog(),
     );
     if (recipe != null) widget.state.addRecipe(recipe);
+  }
+
+  void _openDetails(RecipeMatch match) {
+    showDialog<void>(
+      context: context,
+      builder: (_) => RecipeDetailDialog(
+        match: match,
+        onFavorite: () => widget.state.toggleFavorite(match.recipe),
+        onHide: () => widget.state.toggleHidden(match.recipe),
+      ),
+    );
   }
 
   void _toggle(MealType m, bool on) {
@@ -33,9 +45,23 @@ class _RecipesPageState extends State<RecipesPage> {
     });
   }
 
+  Widget _card(RecipeMatch m) => Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: RecipeCard(
+          match: m,
+          onTap: () => _openDetails(m),
+          onFavorite: () => widget.state.toggleFavorite(m.recipe),
+          onHide: () => widget.state.toggleHidden(m.recipe),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
+    final shades = AppShades.of(context);
     final matches = widget.state.matches(meals: _filters);
+    final favorites = matches.where((m) => m.recipe.favorite).toList();
+    final hidden = matches.where((m) => m.recipe.hidden).toList();
+    final rest = matches.where((m) => !m.recipe.favorite && !m.recipe.hidden).toList();
 
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -77,13 +103,41 @@ class _RecipesPageState extends State<RecipesPage> {
                       _filters.isEmpty
                           ? 'No recipes yet. Add one to get started.'
                           : 'No recipes match these filters.',
-                      style: TextStyle(color: AppShades.of(context).muted),
+                      style: TextStyle(color: shades.muted),
                     ),
                   )
-                : ListView.separated(
-                    itemCount: matches.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (_, i) => RecipeCard(match: matches[i]),
+                : ListView(
+                    children: [
+                      if (favorites.isNotEmpty) ...[
+                        _SectionLabel(
+                          icon: Icons.star_rounded,
+                          label: 'Favorites',
+                          count: favorites.length,
+                        ),
+                        for (final m in favorites) _card(m),
+                        const SizedBox(height: 12),
+                      ],
+                      if (rest.isNotEmpty) ...[
+                        _SectionLabel(
+                          icon: Icons.menu_book_outlined,
+                          label: 'All recipes',
+                          count: rest.length,
+                        ),
+                        for (final m in rest) _card(m),
+                        const SizedBox(height: 12),
+                      ],
+                      if (hidden.isNotEmpty) ...[
+                        _SectionLabel(
+                          icon: Icons.visibility_off_outlined,
+                          label: 'Hidden',
+                          count: hidden.length,
+                          expanded: _showHidden,
+                          onTap: () => setState(() => _showHidden = !_showHidden),
+                        ),
+                        if (_showHidden)
+                          for (final m in hidden) _card(m),
+                      ],
+                    ],
                   ),
           ),
         ],
@@ -92,61 +146,293 @@ class _RecipesPageState extends State<RecipesPage> {
   }
 }
 
+class _SectionLabel extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final int count;
+  final bool? expanded;
+  final VoidCallback? onTap;
+
+  const _SectionLabel({
+    required this.icon,
+    required this.label,
+    required this.count,
+    this.expanded,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final shades = AppShades.of(context);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: shades.muted),
+            const SizedBox(width: 8),
+            Text(
+              '$label ($count)',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: shades.ink,
+              ),
+            ),
+            if (expanded != null) ...[
+              const SizedBox(width: 4),
+              Icon(
+                expanded! ? Icons.expand_less : Icons.expand_more,
+                color: shades.muted,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class RecipeCard extends StatelessWidget {
   final RecipeMatch match;
-  const RecipeCard({super.key, required this.match});
+  final VoidCallback onTap;
+  final VoidCallback onFavorite;
+  final VoidCallback onHide;
+
+  const RecipeCard({
+    super.key,
+    required this.match,
+    required this.onTap,
+    required this.onFavorite,
+    required this.onHide,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final shades = AppShades.of(context);
+    final primary = Theme.of(context).colorScheme.primary;
+    final r = match.recipe;
+    final complete = match.missing.isEmpty;
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+          child: Row(
+            children: [
+              _MatchRing(have: match.have.length, total: r.ingredients.length),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            r.name,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              color: shades.ink,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Chip(
+                          label: Text(r.meal.label),
+                          visualDensity: VisualDensity.compact,
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      complete
+                          ? 'You have everything for this.'
+                          : 'Missing: ${match.missing.join(', ')}',
+                      style: TextStyle(color: complete ? shades.matchComplete : shades.muted),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                tooltip: r.favorite ? 'Remove from favorites' : 'Add to favorites',
+                onPressed: onFavorite,
+                icon: Icon(
+                  r.favorite ? Icons.star_rounded : Icons.star_outline_rounded,
+                  color: r.favorite ? primary : shades.muted,
+                ),
+              ),
+              IconButton(
+                tooltip: r.hidden ? 'Unhide' : 'Hide',
+                onPressed: onHide,
+                icon: Icon(
+                  r.hidden ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                  color: shades.muted,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class RecipeDetailDialog extends StatelessWidget {
+  final RecipeMatch match;
+  final VoidCallback onFavorite;
+  final VoidCallback onHide;
+
+  const RecipeDetailDialog({
+    super.key,
+    required this.match,
+    required this.onFavorite,
+    required this.onHide,
+  });
 
   @override
   Widget build(BuildContext context) {
     final shades = AppShades.of(context);
     final r = match.recipe;
-    final complete = match.missing.isEmpty;
+    final steps = r.instructions
+        .split('\n')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
+    final details = [
+      if (r.duration != null) (Icons.schedule, '${r.duration} min'),
+      if (r.servingSize != null) (Icons.people_outline, 'Serves ${r.servingSize}'),
+      if (r.difficulty.isNotEmpty) (Icons.signal_cellular_alt, r.difficulty),
+    ];
+
+    return AlertDialog(
+      scrollable: true,
+      title: Row(
+        children: [
+          Expanded(child: Text(r.name)),
+          IconButton(
+            tooltip: 'Close',
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.close),
+          ),
+        ],
+      ),
+      content: SizedBox(
+        width: 520,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _MatchRing(have: match.have.length, total: r.ingredients.length),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                Chip(label: Text(r.meal.label)),
+                if (r.type.isNotEmpty) Chip(label: Text(r.type)),
+              ],
+            ),
+            if (details.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 20,
+                runSpacing: 8,
                 children: [
-                  Row(
+                  for (final (icon, label) in details)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(icon, size: 18, color: shades.muted),
+                        const SizedBox(width: 6),
+                        Text(label, style: TextStyle(color: shades.muted)),
+                      ],
+                    ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 20),
+            Text(
+              'Ingredients (${match.have.length}/${r.ingredients.length} on hand)',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 8),
+            if (r.ingredients.isEmpty)
+              Text('No ingredients listed.', style: TextStyle(color: shades.muted)),
+            for (final ing in r.ingredients)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3),
+                child: Row(
+                  children: [
+                    Icon(
+                      match.have.contains(ing)
+                          ? Icons.check_circle
+                          : Icons.radio_button_unchecked,
+                      size: 20,
+                      color: match.have.contains(ing) ? shades.matchComplete : shades.muted,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(child: Text(ing)),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 20),
+            const Text(
+              'Instructions',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 8),
+            if (steps.isEmpty)
+              Text('No instructions yet.', style: TextStyle(color: shades.muted)),
+            if (steps.length == 1)
+              SelectableText(steps.first, style: const TextStyle(height: 1.5)),
+            if (steps.length > 1)
+              for (var i = 0; i < steps.length; i++)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Flexible(
+                      SizedBox(
+                        width: 28,
                         child: Text(
-                          r.name,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: shades.ink,
-                          ),
+                          '${i + 1}.',
+                          style: const TextStyle(fontWeight: FontWeight.w700, height: 1.5),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Chip(
-                        label: Text(r.meal.label),
-                        visualDensity: VisualDensity.compact,
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      Expanded(
+                        child: SelectableText(steps[i], style: const TextStyle(height: 1.5)),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    complete
-                        ? 'You have everything for this.'
-                        : 'Missing: ${match.missing.join(', ')}',
-                    style: TextStyle(color: complete ? shades.matchComplete : shades.muted),
-                  ),
-                ],
-              ),
-            ),
+                ),
           ],
         ),
       ),
+      actions: [
+        TextButton.icon(
+          onPressed: () {
+            Navigator.pop(context);
+            onHide();
+          },
+          icon: Icon(r.hidden ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+          label: Text(r.hidden ? 'Unhide' : 'Hide'),
+        ),
+        FilledButton.icon(
+          onPressed: () {
+            Navigator.pop(context);
+            onFavorite();
+          },
+          icon: Icon(r.favorite ? Icons.star_rounded : Icons.star_outline_rounded),
+          label: Text(r.favorite ? 'Unfavorite' : 'Favorite'),
+        ),
+      ],
     );
   }
 }

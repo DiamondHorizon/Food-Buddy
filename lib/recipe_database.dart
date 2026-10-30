@@ -1029,4 +1029,24 @@ class RecipeDatabase {
       },
     );
   }
+
+  Future<int> setFavorite(int id, bool value) async {
+    final db = await instance.database;
+    return await db.update(
+      'Recipes',
+      {'favorite': value ? 1 : 0, if (value) 'hidden': 0},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<int> setHidden(int id, bool value) async {
+    final db = await instance.database;
+    return await db.update(
+      'Recipes',
+      {'hidden': value ? 1 : 0, if (value) 'favorite': 0},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 }

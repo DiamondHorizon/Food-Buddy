@@ -43,7 +43,7 @@ class RecipeDatabase {
         instructions TEXT NOT NULL,
         ingredients TEXT,
         dietRestriction TEXT,
-        duration INTEGER,
+        duration REAL,
         calories REAL,
         protein REAL,
         carbs REAL,
@@ -927,7 +927,7 @@ class RecipeDatabase {
       'difficulty': 'Easy',
       'servingSize': 1
     });
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Ground Beef',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -942,7 +942,7 @@ class RecipeDatabase {
       'difficulty': 'Easy',
       'servingSize': 1
     });
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'College Ramen',
       'type': 'Entree',
       'meal': 'Dinner',
@@ -957,7 +957,7 @@ class RecipeDatabase {
       'difficulty': 'Easy',
       'servingSize': 4
     });
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Soft Boiled Egg',
       'type': 'Appetizer',
       'meal': 'Breakfast',
@@ -972,7 +972,7 @@ class RecipeDatabase {
       'difficulty': 'Easy',
       'servingSize': 4
     });
-    await db.insert('Recipes', {
+    await _insertIfMissing(db, {
       'name': 'Tuna',
       'type': 'Entree',
       'meal': 'Breakfast',
@@ -1015,7 +1015,9 @@ class RecipeDatabase {
 
   // Insert a new item into the database
   Future<int> insertItem(String name, String type, String meal, String instructions,
-      {String ingredients = '', int servingSize = 1}) async {
+      {String ingredients = '', String dietRestriction = '', double duration = 0.0, 
+      double calories = 0.0, double protein = 0.0, double carbs = 0.0, 
+      double fat = 0.0, String difficulty = '', int servingSize = 1}) async {
     final db = await instance.database;
     return await db.insert(
       'Recipes',
@@ -1025,6 +1027,13 @@ class RecipeDatabase {
         'meal': meal,
         'instructions': instructions,
         'ingredients': ingredients,
+        'dietRestriction': dietRestriction,
+        'duration': duration,
+        'calories': calories,
+        'protein': protein,
+        'carbs': carbs,
+        'fat': fat,
+        'difficulty': difficulty,
         'servingSize': servingSize,
       },
     );

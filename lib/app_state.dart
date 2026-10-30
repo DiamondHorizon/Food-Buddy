@@ -58,6 +58,17 @@ MealType mealTypeFrom(Object? value) => MealType.values.firstWhere(
       orElse: () => MealType.dinner,
     );
 
+enum Difficulty { easy, intermediate, advanced, difficult, experienced }
+
+extension DifficultyLabel on Difficulty {
+  String get label => name[0].toUpperCase() + name.substring(1);
+}
+
+Difficulty difficultyFrom(Object? value) => Difficulty.values.firstWhere(
+      (m) => m.name == value.toString().trim().toLowerCase(),
+      orElse: () => Difficulty.easy,
+    );
+
 class Ingredient {
   final int? id;
   final String name;
@@ -82,6 +93,13 @@ class Recipe {
   final String type;
   final MealType meal;
   final String instructions;
+  final String dietRestriction;
+  final double duration;
+  final double calories;
+  final double protein;
+  final double carbs;
+  final double fat;
+  final Difficulty difficulty;
   final List<String> ingredients;
   final int? duration;
   final int? servingSize;
@@ -95,6 +113,13 @@ class Recipe {
     this.type = '',
     required this.meal,
     this.instructions = '',
+    this.dietRestriction = '',
+    this.duration = 0.0,
+    this.calories = 0.0,
+    this.protein = 0.0,
+    this.carbs = 0.0,
+    this.fat = 0.0,
+    this.difficulty = Difficulty.easy,
     required this.ingredients,
     this.duration,
     this.servingSize,
@@ -109,6 +134,13 @@ class Recipe {
         type: (row['type'] as String?) ?? '',
         meal: mealTypeFrom(row['meal']),
         instructions: (row['instructions'] as String?) ?? '',
+        dietRestriction: (row['dietRestriction'] as String?) ?? '',
+        duration: (row['duration'] as double?) ?? 0.0,
+        calories: (row['calories'] as double?) ?? 0.0,
+        protein: (row['protein'] as double?) ?? 0.0,
+        carbs: (row['carbs'] as double?) ?? 0.0,
+        fat: (row['fat'] as double?) ?? 0.0,
+        difficulty: difficultyFrom(row['difficulty']),
         ingredients: ((row['ingredients'] as String?) ?? '')
             .split(',')
             .map((s) => s.trim().toLowerCase())

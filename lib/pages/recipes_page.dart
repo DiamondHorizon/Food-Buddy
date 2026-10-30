@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../app_state.dart';
 import '../app_theme.dart';
@@ -478,11 +479,20 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
   final _name = TextEditingController();
   final _type = TextEditingController();
   final _instructions = TextEditingController();
+  final TextEditingController _duration = TextEditingController();
   final _ingredientInput = TextEditingController();
   final List<String> _ingredients = [];
   MealType _meal = MealType.dinner;
+  Difficulty _difficulty = Difficulty.easy;
   String? _nameError;
   String? _ingredientError;
+
+  bool _showAdvanced = false; // Tracks if advanced fields are visible
+  final TextEditingController _dietRestriction = TextEditingController();
+  final TextEditingController _calories = TextEditingController();
+  final TextEditingController _protein = TextEditingController();
+  final TextEditingController _carbs = TextEditingController();
+  final TextEditingController _fat = TextEditingController();
 
   void _addIngredients() {
     final parts = _ingredientInput.text
@@ -508,6 +518,13 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
     });
     if (_nameError != null || _ingredientError != null) return;
 
+    // Safely parse text fields into doubles, defaulting to -1.0 if empty/invalid
+    final double durationValue = double.tryParse(_duration.text.trim()) ?? 0.0;
+    final double calorieValue = double.tryParse(_calories.text.trim()) ?? 0.0;
+    final double proteinValue = double.tryParse(_protein.text.trim()) ?? 0.0;
+    final double carbValue = double.tryParse(_carbs.text.trim()) ?? 0.0;
+    final double fatValue = double.tryParse(_fat.text.trim()) ?? 0.0;
+
     Navigator.pop(
       context,
       Recipe(
@@ -515,6 +532,13 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
         type: _type.text.trim(),
         meal: _meal,
         instructions: _instructions.text.trim(),
+        dietRestriction: _dietRestriction.text.trim(),
+        duration: durationValue,
+        calories: calorieValue,
+        protein: proteinValue,
+        carbs: carbValue,
+        fat: fatValue,
+        // difficulty: _difficulty,
         ingredients: List.of(_ingredients),
       ),
     );
@@ -525,6 +549,12 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
     _name.dispose();
     _type.dispose();
     _instructions.dispose();
+    _duration.dispose();
+    _dietRestriction.dispose();
+    _calories.dispose();
+    _protein.dispose();
+    _carbs.dispose();
+    _fat.dispose();
     _ingredientInput.dispose();
     super.dispose();
   }
@@ -602,11 +632,113 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
               ),
               const SizedBox(height: 16),
               TextField(
+                controller: _duration,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true), // Better mobile keyboard for decimals
+                inputFormatters: [
+                  // This regular expression strictly allows only numbers and a decimal point
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                ],
+                decoration: const InputDecoration(
+                  labelText: 'Prep Time (Hours)',
+                  hintText: 'e.g. 0.5',
+                  ),
+              ),
+               const SizedBox(height: 16),
+              Text('Difficulty', style: TextStyle(color: AppShades.of(context).muted)),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final m in Difficulty.values)
+                    ChoiceChip(
+                      label: Text(m.label),
+                      selected: _difficulty == m,
+                      onSelected: (_) => setState(() => _difficulty = m),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              TextField(
                 controller: _instructions,
                 minLines: 3,
                 maxLines: 6,
                 decoration: const InputDecoration(labelText: 'Instructions'),
               ),
+              const SizedBox(height: 16),
+              // Advanced Collapsable Button
+              TextButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _showAdvanced = !_showAdvanced; // Flips true <-> false
+                  });
+                },
+                icon: Icon(_showAdvanced ? Icons.expand_less : Icons.expand_more),
+                label: Text(_showAdvanced ? 'Hide Advanced' : 'Advanced Options'),
+              ),
+              // Advanced Fields
+              if (_showAdvanced) ...[
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _dietRestriction,
+                  decoration: const InputDecoration(
+                    labelText: 'Dietary Restrictions',
+                    hintText: 'e.g. Gluten-Free, Vegan, Low-Carb',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _calories,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true), // Better mobile keyboard for decimals
+                  inputFormatters: [
+                    // This regular expression strictly allows only numbers and a decimal point
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                  ],
+                  decoration: const InputDecoration(
+                    labelText: 'Calories',
+                    hintText: 'e.g. 450',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _protein,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true), // Better mobile keyboard for decimals
+                  inputFormatters: [
+                    // This regular expression strictly allows only numbers and a decimal point
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                  ],
+                  decoration: const InputDecoration(
+                    labelText: 'Protein (g)',
+                    hintText: 'e.g. 30',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _carbs,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true), // Better mobile keyboard for decimals
+                  inputFormatters: [
+                    // This regular expression strictly allows only numbers and a decimal point
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                  ],
+                  decoration: const InputDecoration(
+                    labelText: 'Carbs (g)',
+                    hintText: 'e.g. 45',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _fat,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true), // Better mobile keyboard for decimals
+                  inputFormatters: [
+                    // This regular expression strictly allows only numbers and a decimal point
+                    FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                  ],
+                  decoration: const InputDecoration(
+                    labelText: 'Fat (g)',
+                    hintText: 'e.g. 15',
+                  ),
+                ),
+              ],
             ],
           ),
         ),

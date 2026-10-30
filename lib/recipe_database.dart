@@ -25,7 +25,8 @@ class RecipeDatabase {
       onUpgrade: _upgradeDB,
     );
   }
-
+  // reformat ingredient to have qty specifications and compare with how much of an ingredient is in the panty, do operations to update inventory
+  
   // Create tables and insert starter recipes here
   Future _createDB(Database db, int version) async {
     // Create the table

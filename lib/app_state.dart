@@ -47,7 +47,7 @@ StorageArea storageAreaFrom(Object? value) => StorageArea.values.firstWhere(
       orElse: () => StorageArea.pantry,
     );
 
-enum MealType { breakfast, lunch, dinner, snack, dessert, drink }
+enum MealType { breakfast, lunch, dinner, snack, drink }
 
 extension MealTypeLabel on MealType {
   String get label => name[0].toUpperCase() + name.substring(1);

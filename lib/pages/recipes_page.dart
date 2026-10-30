@@ -11,9 +11,11 @@ extension on _SearchBy {
   String get label => switch (this) {
     _SearchBy.name => 'Name',
     _SearchBy.ingredient => 'Ingredient',
-    _SearchBy.servings => 'Servings', // TODO: implement only numbers foolproofing, advanced filtering (protein, calorie, date night approved)
+    _SearchBy.servings => 'Servings', 
+    // TODO: implement only numbers foolproofing, advanced filtering (protein, calorie, date night approved, cook time)
   };
-
+    // input for ingredients: quantity, measurement + custom unit, and ingredient, ingredient notes (large clove, quality type)
+    // dessert should have its own category, two different fields can get confusing
   String get hint => switch (this) {
     _SearchBy.name => 'Search by recipe name',
     _SearchBy.ingredient => 'e.g. egg, milk',

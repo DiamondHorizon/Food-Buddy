@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../app_state.dart';
 import '../app_theme.dart';
 import '../page_header.dart';
-
+// idea: PLUFINDER
 class InventoryPage extends StatelessWidget {
   final AppState state;
   const InventoryPage({super.key, required this.state});

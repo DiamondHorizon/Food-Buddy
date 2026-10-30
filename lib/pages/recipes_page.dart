@@ -5,6 +5,22 @@ import '../app_state.dart';
 import '../app_theme.dart';
 import '../page_header.dart';
 
+enum _SearchBy { name, ingredient, servings }
+
+extension on _SearchBy {
+  String get label => switch (this) {
+    _SearchBy.name => 'Name',
+    _SearchBy.ingredient => 'Ingredient',
+    _SearchBy.servings => 'Servings',
+  };
+
+  String get hint => switch (this) {
+    _SearchBy.name => 'Search by recipe name',
+    _SearchBy.ingredient => 'e.g. egg, milk',
+    _SearchBy.servings => 'Minimum servings, e.g. 4',
+  };
+}
+
 class RecipesPage extends StatefulWidget {
   final AppState state;
   const RecipesPage({super.key, required this.state});
@@ -16,6 +32,33 @@ class RecipesPage extends StatefulWidget {
 class _RecipesPageState extends State<RecipesPage> {
   final Set<MealType> _filters = {};
   bool _showHidden = false;
+  final _search = TextEditingController();
+  String _query = '';
+  _SearchBy _searchBy = _SearchBy.name;
+
+  bool _matchesSearch(Recipe r) {
+    final q = _query.trim().toLowerCase();
+    if (q.isEmpty) return true;
+    return switch (_searchBy) {
+      _SearchBy.name => r.name.toLowerCase().contains(q),
+      _SearchBy.ingredient =>
+        q
+            .split(',')
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty)
+            .every((wanted) => r.ingredients.any((i) => i.contains(wanted))),
+      _SearchBy.servings => switch (int.tryParse(q)) {
+        null => true,
+        final n => (r.servingSize ?? 0) >= n,
+      },
+    };
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
 
   Future<void> _openAddDialog() async {
     final recipe = await showDialog<Recipe>(
@@ -47,22 +90,27 @@ class _RecipesPageState extends State<RecipesPage> {
   }
 
   Widget _card(RecipeMatch m) => Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: RecipeCard(
-          match: m,
-          onTap: () => _openDetails(m),
-          onFavorite: () => widget.state.toggleFavorite(m.recipe),
-          onHide: () => widget.state.toggleHidden(m.recipe),
-        ),
-      );
+    padding: const EdgeInsets.only(bottom: 10),
+    child: RecipeCard(
+      match: m,
+      onTap: () => _openDetails(m),
+      onFavorite: () => widget.state.toggleFavorite(m.recipe),
+      onHide: () => widget.state.toggleHidden(m.recipe),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
     final shades = AppShades.of(context);
-    final matches = widget.state.matches(meals: _filters);
+    final matches = widget.state
+        .matches(meals: _filters)
+        .where((m) => _matchesSearch(m.recipe))
+        .toList();
     final favorites = matches.where((m) => m.recipe.favorite).toList();
     final hidden = matches.where((m) => m.recipe.hidden).toList();
-    final rest = matches.where((m) => !m.recipe.favorite && !m.recipe.hidden).toList();
+    final rest = matches
+        .where((m) => !m.recipe.favorite && !m.recipe.hidden)
+        .toList();
 
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -79,6 +127,48 @@ class _RecipesPageState extends State<RecipesPage> {
             ),
           ),
           const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _search,
+                  onChanged: (value) => setState(() => _query = value),
+                  keyboardType: _searchBy == _SearchBy.servings
+                      ? TextInputType.number
+                      : TextInputType.text,
+                  decoration: InputDecoration(
+                    hintText: _searchBy.hint,
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _query.isEmpty
+                        ? null
+                        : IconButton(
+                            tooltip: 'Clear search',
+                            icon: const Icon(Icons.close),
+                            onPressed: () {
+                              _search.clear();
+                              setState(() => _query = '');
+                            },
+                          ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              SegmentedButton<_SearchBy>(
+                segments: [
+                  for (final s in _SearchBy.values)
+                    ButtonSegment(value: s, label: Text(s.label)),
+                ],
+                selected: {_searchBy},
+                showSelectedIcon: false,
+                onSelectionChanged: (s) => setState(() {
+                  _searchBy = s.first;
+                  _search.clear();
+                  _query = '';
+                }),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -101,7 +191,9 @@ class _RecipesPageState extends State<RecipesPage> {
             child: matches.isEmpty
                 ? Center(
                     child: Text(
-                      _filters.isEmpty
+                      _query.trim().isNotEmpty
+                          ? 'No recipes match "$_query".'
+                          : _filters.isEmpty
                           ? 'No recipes yet. Add one to get started.'
                           : 'No recipes match these filters.',
                       style: TextStyle(color: shades.muted),
@@ -133,7 +225,8 @@ class _RecipesPageState extends State<RecipesPage> {
                           label: 'Hidden',
                           count: hidden.length,
                           expanded: _showHidden,
-                          onTap: () => setState(() => _showHidden = !_showHidden),
+                          onTap: () =>
+                              setState(() => _showHidden = !_showHidden),
                         ),
                         if (_showHidden)
                           for (final m in hidden) _card(m),
@@ -249,7 +342,8 @@ class RecipeCard extends StatelessWidget {
                         Chip(
                           label: Text(r.meal.label),
                           visualDensity: VisualDensity.compact,
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
                         ),
                       ],
                     ),
@@ -258,13 +352,17 @@ class RecipeCard extends StatelessWidget {
                       complete
                           ? 'You have everything for this.'
                           : 'Missing: ${match.missing.join(', ')}',
-                      style: TextStyle(color: complete ? shades.matchComplete : shades.muted),
+                      style: TextStyle(
+                        color: complete ? shades.matchComplete : shades.muted,
+                      ),
                     ),
                   ],
                 ),
               ),
               IconButton(
-                tooltip: r.favorite ? 'Remove from favorites' : 'Add to favorites',
+                tooltip: r.favorite
+                    ? 'Remove from favorites'
+                    : 'Add to favorites',
                 onPressed: onFavorite,
                 icon: Icon(
                   r.favorite ? Icons.star_rounded : Icons.star_outline_rounded,
@@ -275,7 +373,9 @@ class RecipeCard extends StatelessWidget {
                 tooltip: r.hidden ? 'Unhide' : 'Hide',
                 onPressed: onHide,
                 icon: Icon(
-                  r.hidden ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                  r.hidden
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
                   color: shades.muted,
                 ),
               ),
@@ -311,8 +411,9 @@ class RecipeDetailDialog extends StatelessWidget {
 
     final details = [
       if (r.duration != null) (Icons.schedule, '${r.duration} min'),
-      if (r.servingSize != null) (Icons.people_outline, 'Serves ${r.servingSize}'),
-      if (r.difficulty.isNotEmpty) (Icons.signal_cellular_alt, r.difficulty),
+      if (r.servingSize != null)
+        (Icons.people_outline, 'Serves ${r.servingSize}'),
+      (Icons.signal_cellular_alt, r.difficulty.label),
     ];
 
     return AlertDialog(
@@ -365,7 +466,10 @@ class RecipeDetailDialog extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             if (r.ingredients.isEmpty)
-              Text('No ingredients listed.', style: TextStyle(color: shades.muted)),
+              Text(
+                'No ingredients listed.',
+                style: TextStyle(color: shades.muted),
+              ),
             for (final ing in r.ingredients)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 3),
@@ -376,7 +480,9 @@ class RecipeDetailDialog extends StatelessWidget {
                           ? Icons.check_circle
                           : Icons.radio_button_unchecked,
                       size: 20,
-                      color: match.have.contains(ing) ? shades.matchComplete : shades.muted,
+                      color: match.have.contains(ing)
+                          ? shades.matchComplete
+                          : shades.muted,
                     ),
                     const SizedBox(width: 10),
                     Expanded(child: Text(ing)),
@@ -390,7 +496,10 @@ class RecipeDetailDialog extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             if (steps.isEmpty)
-              Text('No instructions yet.', style: TextStyle(color: shades.muted)),
+              Text(
+                'No instructions yet.',
+                style: TextStyle(color: shades.muted),
+              ),
             if (steps.length == 1)
               SelectableText(steps.first, style: const TextStyle(height: 1.5)),
             if (steps.length > 1)
@@ -404,11 +513,17 @@ class RecipeDetailDialog extends StatelessWidget {
                         width: 28,
                         child: Text(
                           '${i + 1}.',
-                          style: const TextStyle(fontWeight: FontWeight.w700, height: 1.5),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            height: 1.5,
+                          ),
                         ),
                       ),
                       Expanded(
-                        child: SelectableText(steps[i], style: const TextStyle(height: 1.5)),
+                        child: SelectableText(
+                          steps[i],
+                          style: const TextStyle(height: 1.5),
+                        ),
                       ),
                     ],
                   ),
@@ -422,7 +537,11 @@ class RecipeDetailDialog extends StatelessWidget {
             Navigator.pop(context);
             onHide();
           },
-          icon: Icon(r.hidden ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+          icon: Icon(
+            r.hidden
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+          ),
           label: Text(r.hidden ? 'Unhide' : 'Hide'),
         ),
         FilledButton.icon(
@@ -430,7 +549,9 @@ class RecipeDetailDialog extends StatelessWidget {
             Navigator.pop(context);
             onFavorite();
           },
-          icon: Icon(r.favorite ? Icons.star_rounded : Icons.star_outline_rounded),
+          icon: Icon(
+            r.favorite ? Icons.star_rounded : Icons.star_outline_rounded,
+          ),
           label: Text(r.favorite ? 'Unfavorite' : 'Favorite'),
         ),
       ],
@@ -461,7 +582,10 @@ class _MatchRing extends StatelessWidget {
               color: complete ? shades.matchComplete : shades.matchPartial,
             ),
           ),
-          Text('$have/$total', style: const TextStyle(fontWeight: FontWeight.w700)),
+          Text(
+            '$have/$total',
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
         ],
       ),
     );
@@ -514,13 +638,14 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
     final name = _name.text.trim();
     setState(() {
       _nameError = name.isEmpty ? 'Enter a recipe name.' : null;
-      _ingredientError = _ingredients.isEmpty ? 'Add at least one ingredient.' : null;
+      _ingredientError = _ingredients.isEmpty
+          ? 'Add at least one ingredient.'
+          : null;
     });
     if (_nameError != null || _ingredientError != null) return;
 
-    // Safely parse text fields into doubles, defaulting to -1.0 if empty/invalid
-    final double durationValue = double.tryParse(_duration.text.trim()) ?? 0.0;
-    final double calorieValue = double.tryParse(_calories.text.trim()) ?? 0.0;
+    final durationValue = int.tryParse(_duration.text.trim());
+    final calorieValue = double.tryParse(_calories.text.trim()) ?? 0;
     final double proteinValue = double.tryParse(_protein.text.trim()) ?? 0.0;
     final double carbValue = double.tryParse(_carbs.text.trim()) ?? 0.0;
     final double fatValue = double.tryParse(_fat.text.trim()) ?? 0.0;
@@ -573,7 +698,10 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
               TextField(
                 controller: _name,
                 autofocus: true,
-                decoration: InputDecoration(labelText: 'Recipe name', errorText: _nameError),
+                decoration: InputDecoration(
+                  labelText: 'Recipe name',
+                  errorText: _nameError,
+                ),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -581,7 +709,10 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
                 decoration: const InputDecoration(labelText: 'Type (optional)'),
               ),
               const SizedBox(height: 16),
-              Text('Meal', style: TextStyle(color: AppShades.of(context).muted)),
+              Text(
+                'Meal',
+                style: TextStyle(color: AppShades.of(context).muted),
+              ),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -633,7 +764,9 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
               const SizedBox(height: 16),
               TextField(
                 controller: _duration,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true), // Better mobile keyboard for decimals
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ), // Better mobile keyboard for decimals
                 inputFormatters: [
                   // This regular expression strictly allows only numbers and a decimal point
                   FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
@@ -641,10 +774,13 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
                 decoration: const InputDecoration(
                   labelText: 'Prep Time (Hours)',
                   hintText: 'e.g. 0.5',
-                  ),
+                ),
               ),
-               const SizedBox(height: 16),
-              Text('Difficulty', style: TextStyle(color: AppShades.of(context).muted)),
+              const SizedBox(height: 16),
+              Text(
+                'Difficulty',
+                style: TextStyle(color: AppShades.of(context).muted),
+              ),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -673,8 +809,12 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
                     _showAdvanced = !_showAdvanced; // Flips true <-> false
                   });
                 },
-                icon: Icon(_showAdvanced ? Icons.expand_less : Icons.expand_more),
-                label: Text(_showAdvanced ? 'Hide Advanced' : 'Advanced Options'),
+                icon: Icon(
+                  _showAdvanced ? Icons.expand_less : Icons.expand_more,
+                ),
+                label: Text(
+                  _showAdvanced ? 'Hide Advanced' : 'Advanced Options',
+                ),
               ),
               // Advanced Fields
               if (_showAdvanced) ...[
@@ -689,7 +829,9 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: _calories,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true), // Better mobile keyboard for decimals
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ), // Better mobile keyboard for decimals
                   inputFormatters: [
                     // This regular expression strictly allows only numbers and a decimal point
                     FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
@@ -702,7 +844,9 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: _protein,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true), // Better mobile keyboard for decimals
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ), // Better mobile keyboard for decimals
                   inputFormatters: [
                     // This regular expression strictly allows only numbers and a decimal point
                     FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
@@ -715,7 +859,9 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: _carbs,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true), // Better mobile keyboard for decimals
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ), // Better mobile keyboard for decimals
                   inputFormatters: [
                     // This regular expression strictly allows only numbers and a decimal point
                     FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
@@ -728,7 +874,9 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: _fat,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true), // Better mobile keyboard for decimals
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ), // Better mobile keyboard for decimals
                   inputFormatters: [
                     // This regular expression strictly allows only numbers and a decimal point
                     FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
@@ -744,7 +892,10 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
         FilledButton(onPressed: _submit, child: const Text('Save recipe')),
       ],
     );

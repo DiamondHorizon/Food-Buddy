@@ -987,6 +987,22 @@ class RecipeDatabase {
       'difficulty': 'Medium',
       'servingSize': 4
     });
+    
+    await _insertIfMissing(db, {
+      'name': 'Oxtail Stew',
+      'type': 'Entree',
+      'meal': 'Dinner',
+      'instructions': 'Brown ~3lbs of oxtail (no oil necessary) in a large pot on medium-high (over 1 gal preferred), about 10 min. Fill pot to just above the meat with water. Add all the spices and roughly diced onion (whole spices preferred, not ground), adding Thai Chili, garlic, and/or Black Peppercorns if preferred. Boil for 3 hours minimum. One hour prior to eating, add all preferred vegetables, chopped roughly to bite size proportions. Salt to preference when done, serve over rice/millet or plain.',
+      'ingredients': 'Oxtail, Cinnamon, Star Anise, Clove, Nutmeg, Onion, Carrot, Celery, Potato, Radish',
+      'dietRestriction': 'None',
+      'duration': 200,
+      'calories': 350.0,
+      'protein': 12.0,
+      'carbs': 10.0,
+      'fat': 10.0,
+      'difficulty': 'Easy',
+      'servingSize': 8
+    });
   }
 
   Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
@@ -1012,10 +1028,10 @@ class RecipeDatabase {
     final db = await instance.database;
     return await db.query('Recipes');
   }
-
+  // duration -> integer comment for devs: threw errors becuase it was cast in a table as int but user side as double, so it crashes
   // Insert a new item into the database
   Future<int> insertItem(String name, String type, String meal, String instructions,
-      {String ingredients = '', String dietRestriction = '', double duration = 0.0, 
+      {String ingredients = '', String dietRestriction = '', int? duration, 
       double calories = 0.0, double protein = 0.0, double carbs = 0.0, 
       double fat = 0.0, String difficulty = '', int servingSize = 1}) async {
     final db = await instance.database;

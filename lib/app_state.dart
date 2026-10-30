@@ -94,16 +94,14 @@ class Recipe {
   final MealType meal;
   final String instructions;
   final String dietRestriction;
-  final double duration;
+  final int? duration;
   final double calories;
   final double protein;
   final double carbs;
   final double fat;
   final Difficulty difficulty;
-  final List<String> ingredients;
-  final int? duration;
   final int? servingSize;
-  final String difficulty;
+  final List<String> ingredients;
   final bool favorite;
   final bool hidden;
 
@@ -114,16 +112,14 @@ class Recipe {
     required this.meal,
     this.instructions = '',
     this.dietRestriction = '',
-    this.duration = 0.0,
+    this.duration,
     this.calories = 0.0,
     this.protein = 0.0,
     this.carbs = 0.0,
     this.fat = 0.0,
     this.difficulty = Difficulty.easy,
-    required this.ingredients,
-    this.duration,
     this.servingSize,
-    this.difficulty = '',
+    required this.ingredients,
     this.favorite = false,
     this.hidden = false,
   });
@@ -135,20 +131,18 @@ class Recipe {
         meal: mealTypeFrom(row['meal']),
         instructions: (row['instructions'] as String?) ?? '',
         dietRestriction: (row['dietRestriction'] as String?) ?? '',
-        duration: (row['duration'] as double?) ?? 0.0,
-        calories: (row['calories'] as double?) ?? 0.0,
-        protein: (row['protein'] as double?) ?? 0.0,
-        carbs: (row['carbs'] as double?) ?? 0.0,
-        fat: (row['fat'] as double?) ?? 0.0,
+        duration: (row['duration'] as num?)?.toInt(),
+        calories: (row['calories'] as num?)?.toDouble() ?? 0.0,
+        protein: (row['protein'] as num?)?.toDouble() ?? 0.0,
+        carbs: (row['carbs'] as num?)?.toDouble() ?? 0.0,
+        fat: (row['fat'] as num?)?.toDouble() ?? 0.0,
         difficulty: difficultyFrom(row['difficulty']),
+        servingSize: (row['servingSize'] as num?)?.toInt(),
         ingredients: ((row['ingredients'] as String?) ?? '')
             .split(',')
             .map((s) => s.trim().toLowerCase())
             .where((s) => s.isNotEmpty)
             .toList(),
-        duration: (row['duration'] as num?)?.toInt(),
-        servingSize: (row['servingSize'] as num?)?.toInt(),
-        difficulty: (row['difficulty'] as String?) ?? '',
         favorite: row['favorite'] == 1,
         hidden: row['hidden'] == 1,
       );
@@ -194,11 +188,18 @@ class AppState extends ChangeNotifier {
     ingredients.remove(item);
     notifyListeners();
   }
-
+  // difficulty enum is stricter so I kept that
   Future<void> addRecipe(Recipe r) async {
     await RecipeDatabase.instance.insertItem(
       r.name, r.type, r.meal.label, r.instructions,
       ingredients: r.ingredients.join(', '),
+      dietRestriction: r.dietRestriction,
+      duration: r.duration,
+      calories: r.calories,
+      protein: r.protein,
+      carbs: r.carbs,
+      fat: r.fat,
+      difficulty: r.difficulty.label,
     );
     await load();
   }

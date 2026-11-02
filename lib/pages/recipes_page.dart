@@ -419,6 +419,13 @@ class RecipeDetailDialog extends StatelessWidget {
       (Icons.signal_cellular_alt, r.difficulty.label),
     ];
 
+    final nutritionDetails = [
+      if (r.calories > 0) (Icons.local_fire_department, '${r.calories} kcal'),
+      if (r.protein > 0) (Icons.fitness_center, '${r.protein} g protein'),
+      if (r.carbs > 0) (Icons.bakery_dining, '${r.carbs} g carbs'),
+      if (r.fat > 0) (Icons.egg, '${r.fat} g fat'),
+    ];
+
     return AlertDialog(
       scrollable: true,
       title: Row(
@@ -459,6 +466,37 @@ class RecipeDetailDialog extends StatelessWidget {
                         Text(label, style: TextStyle(color: shades.muted)),
                       ],
                     ),
+                ],
+              ),
+            ],
+            if (nutritionDetails.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 20,
+                runSpacing: 8,
+                children: [
+                  for (final (icon, label) in nutritionDetails)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(icon, size: 18, color: shades.muted),
+                        const SizedBox(width: 6),
+                        Text(label, style: TextStyle(color: shades.muted)),
+                      ],
+                    ),
+                ],
+              ),
+            ],
+            if (r.dietRestriction.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(Icons.no_food, size: 18, color: shades.muted),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Dietary restrictions: ${r.dietRestriction}',
+                    style: TextStyle(color: shades.muted),
+                  ),
                 ],
               ),
             ],
@@ -607,6 +645,7 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
   final _type = TextEditingController();
   final _instructions = TextEditingController();
   final TextEditingController _duration = TextEditingController();
+  final TextEditingController _servings = TextEditingController();
   final _ingredientInput = TextEditingController();
   final List<String> _ingredients = [];
   MealType _meal = MealType.dinner;
@@ -647,7 +686,8 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
     });
     if (_nameError != null || _ingredientError != null) return;
 
-    final durationValue = int.tryParse(_duration.text.trim());
+    final durationValue = double.tryParse(_duration.text.trim()) ?? 0.0;
+    final servingsValue = int.tryParse(_servings.text.trim());
     final calorieValue = double.tryParse(_calories.text.trim()) ?? 0;
     final double proteinValue = double.tryParse(_protein.text.trim()) ?? 0.0;
     final double carbValue = double.tryParse(_carbs.text.trim()) ?? 0.0;
@@ -662,11 +702,12 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
         instructions: _instructions.text.trim(),
         dietRestriction: _dietRestriction.text.trim(),
         duration: durationValue,
+        servingSize: servingsValue,
         calories: calorieValue,
         protein: proteinValue,
         carbs: carbValue,
         fat: fatValue,
-        // difficulty: _difficulty,
+        difficulty: _difficulty,
         ingredients: List.of(_ingredients),
       ),
     );
@@ -678,6 +719,7 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
     _type.dispose();
     _instructions.dispose();
     _duration.dispose();
+    _servings.dispose();
     _dietRestriction.dispose();
     _calories.dispose();
     _protein.dispose();
@@ -777,6 +819,21 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
                 decoration: const InputDecoration(
                   labelText: 'Prep Time (Hours)',
                   hintText: 'e.g. 0.5',
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _servings,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ), // Better mobile keyboard for decimals
+                inputFormatters: [
+                  // This regular expression strictly allows only numbers
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*')),
+                ],
+                decoration: const InputDecoration(
+                  labelText: 'Servings',
+                  hintText: 'e.g. 4',
                 ),
               ),
               const SizedBox(height: 16),

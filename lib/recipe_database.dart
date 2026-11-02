@@ -50,7 +50,7 @@ class RecipeDatabase {
         carbs REAL,
         fat REAL,
         difficulty TEXT,
-        servingSize INTEGER NOT NULL
+        servingSize INTEGER
       )
     ''');
 
@@ -1032,9 +1032,9 @@ class RecipeDatabase {
   // duration -> integer comment for devs: threw errors becuase it was cast in a table as int but user side as double, so it crashes
   // Insert a new item into the database
   Future<int> insertItem(String name, String type, String meal, String instructions,
-      {String ingredients = '', String dietRestriction = '', int? duration, 
+      {String ingredients = '', String dietRestriction = '', double duration = 0.0, 
       double calories = 0.0, double protein = 0.0, double carbs = 0.0, 
-      double fat = 0.0, String difficulty = '', int servingSize = 1}) async {
+      double fat = 0.0, String difficulty = '', int? servingSize = 1}) async {
     final db = await instance.database;
     return await db.insert(
       'Recipes',

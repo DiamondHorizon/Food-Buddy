@@ -94,7 +94,7 @@ class Recipe {
   final MealType meal;
   final String instructions;
   final String dietRestriction;
-  final int? duration;
+  final double duration;
   final double calories;
   final double protein;
   final double carbs;
@@ -112,7 +112,7 @@ class Recipe {
     required this.meal,
     this.instructions = '',
     this.dietRestriction = '',
-    this.duration,
+    this.duration = 0.0,
     this.calories = 0.0,
     this.protein = 0.0,
     this.carbs = 0.0,
@@ -131,7 +131,7 @@ class Recipe {
         meal: mealTypeFrom(row['meal']),
         instructions: (row['instructions'] as String?) ?? '',
         dietRestriction: (row['dietRestriction'] as String?) ?? '',
-        duration: (row['duration'] as num?)?.toInt(),
+        duration: (row['duration'] as num?)?.toDouble() ?? 0.0,
         calories: (row['calories'] as num?)?.toDouble() ?? 0.0,
         protein: (row['protein'] as num?)?.toDouble() ?? 0.0,
         carbs: (row['carbs'] as num?)?.toDouble() ?? 0.0,
@@ -200,6 +200,7 @@ class AppState extends ChangeNotifier {
       carbs: r.carbs,
       fat: r.fat,
       difficulty: r.difficulty.label,
+      servingSize: r.servingSize,
     );
     await load();
   }

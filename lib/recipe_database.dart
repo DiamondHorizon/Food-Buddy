@@ -941,7 +941,7 @@ class RecipeDatabase {
       'carbs': 60.0,
       'fat': 10.0,
       'difficulty': 'Easy',
-      'servingSize': 1
+      'servingSize': 3
     });
     await _insertIfMissing(db, {
       'name': 'College Ramen',
@@ -956,7 +956,7 @@ class RecipeDatabase {
       'carbs': 60.0,
       'fat': 10.0,
       'difficulty': 'Easy',
-      'servingSize': 4
+      'servingSize': 1
     });
     await _insertIfMissing(db, {
       'name': 'Soft Boiled Egg',
@@ -965,13 +965,13 @@ class RecipeDatabase {
       'instructions': 'Boil eggs for 6.5 minutes in pot of boiling water with 1t Salt and 1t Vinegar. Immediately remove and place in ice water. ',
       'ingredients': 'egg',
       'dietRestriction': 'None',
-      'duration': 30,
-      'calories': 500.0,
-      'protein': 20.0,
-      'carbs': 60.0,
-      'fat': 10.0,
+      'duration': 7,
+      'calories': 71.0,
+      'protein': 1.0,
+      'carbs': 1.0,
+      'fat': 0.0,
       'difficulty': 'Easy',
-      'servingSize': 4
+      'servingSize': 1
     });
     await _insertIfMissing(db, {
       'name': 'Tuna',

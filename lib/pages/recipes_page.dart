@@ -5,23 +5,71 @@ import '../app_state.dart';
 import '../app_theme.dart';
 import '../page_header.dart';
 
-enum _SearchBy { name, ingredient, servings }
+enum _SearchBy { name, ingredient }
+
+enum RecipeFilterAttribute {
+  none('All Recipes'),
+  meal('Meal'),
+  type('Type'),
+  difficulty('Difficulty'),
+  servings('Servings'),
+  duration('Duration (max)'),
+  calories('Calories (max)'),
+  protein('Protein (min)'),
+  carbs('Carbs (max)'),
+  fat('Fat (max)');
+
+  final String label;
+  const RecipeFilterAttribute(this.label);
+}
 
 extension on _SearchBy {
   String get label => switch (this) {
     _SearchBy.name => 'Name',
     _SearchBy.ingredient => 'Ingredient',
-    _SearchBy.servings => 'Servings', 
-    // TODO: implement only numbers foolproofing, advanced filtering (protein, calorie, date night approved, cook time)
   };
     // input for ingredients: quantity, measurement + custom unit, and ingredient, ingredient notes (large clove, quality type)
     // dessert should have its own category, two different fields can get confusing
     //image upload to and personal 
   String get hint => switch (this) {
     _SearchBy.name => 'Search by recipe name',
-    _SearchBy.ingredient => 'e.g. egg, milk',
-    _SearchBy.servings => 'Minimum servings, e.g. 4',
+    _SearchBy.ingredient => 'Search by included ingredients (separated by commas)',
   };
+}
+
+class RecipeFilterState {
+  MealType? meal;
+  String? type;
+  Difficulty? difficulty;
+  int? servings;
+  double? maxDuration;
+  double? maxCalories;
+  double? minProtein;
+  double? maxCarbs;
+  double? maxFat;
+
+  bool get hasActiveFilters =>
+      meal != null ||
+      (type != null && type!.isNotEmpty) ||
+      difficulty != null ||
+      servings != null ||
+      maxDuration != null ||
+      maxCalories != null ||
+      minProtein != null ||
+      maxCarbs != null ||
+      maxFat != null;
+
+  void clear() {
+    meal = null;
+    type = null;
+    difficulty = null;
+    servings = null;
+    maxDuration = null;
+    maxCalories = null;
+    minProtein = null;
+    maxCarbs = null;
+    maxFat = null;
+  }
 }
 
 class RecipesPage extends StatefulWidget {
@@ -35,31 +83,76 @@ class RecipesPage extends StatefulWidget {
 class _RecipesPageState extends State<RecipesPage> {
   final Set<MealType> _filters = {};
   bool _showHidden = false;
-  final _search = TextEditingController();
-  String _query = '';
-  _SearchBy _searchBy = _SearchBy.name;
 
+  // Text search
+  _SearchBy _searchBy = _SearchBy.name;
+  final TextEditingController _search = TextEditingController();
+  String _query = '';
+
+  // Attribute filtering
+  final RecipeFilterState _activeFilters = RecipeFilterState();
+
+  // Get matches for attribute filtering
+  bool _matchesFilters(Recipe r) {
+    if (_activeFilters.meal != null && r.meal != _activeFilters.meal) return false;
+    if (_activeFilters.difficulty != null && r.difficulty != _activeFilters.difficulty) return false;
+    
+    if (_activeFilters.type != null && _activeFilters.type!.isNotEmpty) {
+      if (!r.type.toLowerCase().contains(_activeFilters.type!.toLowerCase())) return false;
+    }
+    
+    if (_activeFilters.servings != null) {
+      if (r.servingSize == null || r.servingSize != _activeFilters.servings) return false;
+    }
+    
+    if (_activeFilters.maxDuration != null) {
+      if (r.duration < 0 || r.duration > _activeFilters.maxDuration!) return false;
+    }
+    
+    if (_activeFilters.maxCalories != null) {
+      if (r.calories < 0 || r.calories > _activeFilters.maxCalories!) return false;
+    }
+    
+    if (_activeFilters.minProtein != null) {
+      if (r.protein < 0 || r.protein < _activeFilters.minProtein!) return false;
+    }
+    
+    if (_activeFilters.maxCarbs != null) {
+      if (r.carbs < 0 || r.carbs > _activeFilters.maxCarbs!) return false;
+    }
+    
+    if (_activeFilters.maxFat != null) {
+      if (r.fat < 0 || r.fat > _activeFilters.maxFat!) return false;
+    }
+    
+    return true;
+  }
+
+  // Get matches for text search
   bool _matchesSearch(Recipe r) {
     final q = _query.trim().toLowerCase();
-    if (q.isEmpty) return true;
-    return switch (_searchBy) {
-      _SearchBy.name => r.name.toLowerCase().contains(q),
-      _SearchBy.ingredient =>
-        q
+    bool textMatch = true;
+    
+    // Only evaluate text matching if the user actually typed a query
+    if (q.isNotEmpty) {
+      textMatch = switch (_searchBy) {
+        _SearchBy.name => r.name.toLowerCase().contains(q),
+        _SearchBy.ingredient => q
             .split(',')
             .map((s) => s.trim())
             .where((s) => s.isNotEmpty)
             .every((wanted) => r.ingredients.any((i) => i.contains(wanted))),
-      _SearchBy.servings => switch (int.tryParse(q)) {
-        null => true,
-        final n => (r.servingSize ?? 0) >= n,
-      },
-    };
+      };
+    }
+    
+    // Always check both text search and the attribute filters
+    return textMatch && _matchesFilters(r);
   }
 
   @override
   void dispose() {
     _search.dispose();
+    _activeFilters.clear();
     super.dispose();
   }
 
@@ -80,16 +173,6 @@ class _RecipesPageState extends State<RecipesPage> {
         onHide: () => widget.state.toggleHidden(match.recipe),
       ),
     );
-  }
-
-  void _toggle(MealType m, bool on) {
-    setState(() {
-      if (on) {
-        _filters.add(m);
-      } else {
-        _filters.remove(m);
-      }
-    });
   }
 
   Widget _card(RecipeMatch m) => Padding(
@@ -136,22 +219,39 @@ class _RecipesPageState extends State<RecipesPage> {
                 child: TextField(
                   controller: _search,
                   onChanged: (value) => setState(() => _query = value),
-                  keyboardType: _searchBy == _SearchBy.servings
-                      ? TextInputType.number
-                      : TextInputType.text,
+                  keyboardType: TextInputType.text,
                   decoration: InputDecoration(
                     hintText: _searchBy.hint,
                     prefixIcon: const Icon(Icons.search),
-                    suffixIcon: _query.isEmpty
-                        ? null
-                        : IconButton(
-                            tooltip: 'Clear search',
+                    // Suffix actions inside search bar: clear text or open popup filter
+                    suffixIcon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_query.isNotEmpty)
+                          IconButton(
                             icon: const Icon(Icons.close),
                             onPressed: () {
                               _search.clear();
                               setState(() => _query = '');
                             },
                           ),
+                        // The filter dialog button
+                        IconButton(
+                          tooltip: 'Filter recipes',
+                          icon: Badge(
+                            isLabelVisible: _activeFilters.hasActiveFilters,
+                            child: const Icon(Icons.tune),
+                          ),
+                          onPressed: () async {
+                            await showDialog(
+                              context: context,
+                              builder: (_) => _RecipeFilterDialog(currentFilters: _activeFilters),
+                            );
+                            setState(() {}); // Refresh list with new filter values
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -169,24 +269,6 @@ class _RecipesPageState extends State<RecipesPage> {
                   _query = '';
                 }),
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              FilterChip(
-                label: const Text('All'),
-                selected: _filters.isEmpty,
-                onSelected: (_) => setState(_filters.clear),
-              ),
-              for (final m in MealType.values)
-                FilterChip(
-                  label: Text(m.label),
-                  selected: _filters.contains(m),
-                  onSelected: (on) => _toggle(m, on),
-                ),
             ],
           ),
           const SizedBox(height: 16),
@@ -239,6 +321,185 @@ class _RecipesPageState extends State<RecipesPage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _RecipeFilterDialog extends StatefulWidget {
+  final RecipeFilterState currentFilters;
+  const _RecipeFilterDialog({required this.currentFilters});
+
+  @override
+  State<_RecipeFilterDialog> createState() => _RecipeFilterDialogState();
+}
+
+class _RecipeFilterDialogState extends State<_RecipeFilterDialog> {
+  late MealType? _meal = widget.currentFilters.meal;
+  late Difficulty? _difficulty = widget.currentFilters.difficulty;
+  
+  late final TextEditingController _servings = TextEditingController(text: widget.currentFilters.servings?.toString() ?? '');
+  late final TextEditingController _duration = TextEditingController(text: widget.currentFilters.maxDuration?.toString() ?? '');
+  late final TextEditingController _calories = TextEditingController(text: widget.currentFilters.maxCalories?.toString() ?? '');
+  late final TextEditingController _protein = TextEditingController(text: widget.currentFilters.minProtein?.toString() ?? '');
+  late final TextEditingController _carbs = TextEditingController(text: widget.currentFilters.maxCarbs?.toString() ?? '');
+  late final TextEditingController _fat = TextEditingController(text: widget.currentFilters.maxFat?.toString() ?? '');
+  late final TextEditingController _type = TextEditingController(text: widget.currentFilters.type ?? '');
+
+  @override
+  void dispose() {
+    _servings.dispose();
+    _duration.dispose();
+    _calories.dispose();
+    _protein.dispose();
+    _carbs.dispose();
+    _fat.dispose();
+    _type.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Filter Recipes'),
+      content: SizedBox(
+        width: 400,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Meal Filter (Enum List)
+              const Text('Meal', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 6,
+                children: [
+                  ChoiceChip(
+                    label: const Text('Any'),
+                    selected: _meal == null,
+                    onSelected: (_) => setState(() => _meal = null),
+                  ),
+                  for (final m in MealType.values)
+                    ChoiceChip(
+                      label: Text(m.label),
+                      selected: _meal == m,
+                      onSelected: (_) => setState(() => _meal = m),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Difficulty Filter (Enum List)
+              const Text('Difficulty', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 6,
+                children: [
+                  ChoiceChip(
+                    label: const Text('Any'),
+                    selected: _difficulty == null,
+                    onSelected: (_) => setState(() => _difficulty = null),
+                  ),
+                  for (final d in Difficulty.values)
+                    ChoiceChip(
+                      label: Text(d.label),
+                      selected: _difficulty == d,
+                      onSelected: (_) => setState(() => _difficulty = d),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              TextField(
+                controller: _type,
+                decoration: const InputDecoration(labelText: 'Type (e.g. Entree)'),
+              ),
+              const SizedBox(height: 12),
+              
+              // Servings (Integer only)
+              TextField(
+                controller: _servings,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: const InputDecoration(labelText: 'Exact Servings'),
+              ),
+              const SizedBox(height: 12),
+              
+              // Max Duration (Decimals allowed)
+              TextField(
+                controller: _duration,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))],
+                decoration: const InputDecoration(labelText: 'Max Duration (mins)'),
+              ),
+              const SizedBox(height: 12),
+              
+              // Max Calories
+              TextField(
+                controller: _calories,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))],
+                decoration: const InputDecoration(labelText: 'Max Calories'),
+              ),
+              const SizedBox(height: 12),
+              
+              // Min Protein
+              TextField(
+                controller: _protein,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))],
+                decoration: const InputDecoration(labelText: 'Min Protein (g)'),
+              ),
+              const SizedBox(height: 12),
+              
+              // Max Carbs
+              TextField(
+                controller: _carbs,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))],
+                decoration: const InputDecoration(labelText: 'Max Carbs (g)'),
+              ),
+              const SizedBox(height: 12),
+              
+              // Max Fat
+              TextField(
+                controller: _fat,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))],
+                decoration: const InputDecoration(labelText: 'Max Fat (g)'),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            widget.currentFilters.clear();
+            Navigator.pop(context);
+          },
+          child: const Text('Clear All'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () {
+            widget.currentFilters.meal = _meal;
+            widget.currentFilters.difficulty = _difficulty;
+            widget.currentFilters.type = _type.text.trim();
+            widget.currentFilters.servings = int.tryParse(_servings.text.trim());
+            widget.currentFilters.maxDuration = double.tryParse(_duration.text.trim());
+            widget.currentFilters.maxCalories = double.tryParse(_calories.text.trim());
+            widget.currentFilters.minProtein = double.tryParse(_protein.text.trim());
+            widget.currentFilters.maxCarbs = double.tryParse(_carbs.text.trim());
+            widget.currentFilters.maxFat = double.tryParse(_fat.text.trim());
+            Navigator.pop(context);
+          },
+          child: const Text('Apply'),
+        ),
+      ],
     );
   }
 }
@@ -413,7 +674,7 @@ class RecipeDetailDialog extends StatelessWidget {
         .toList();
 
     final details = [
-      if (r.duration != null) (Icons.schedule, '${r.duration} min'),
+      (Icons.schedule, '${r.duration} min'),
       if (r.servingSize != null)
         (Icons.people_outline, 'Serves ${r.servingSize}'),
       (Icons.signal_cellular_alt, r.difficulty.label),
@@ -817,8 +1078,8 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
                   FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
                 ],
                 decoration: const InputDecoration(
-                  labelText: 'Prep Time (Hours)',
-                  hintText: 'e.g. 0.5',
+                  labelText: 'Prep Time (Minutes)',
+                  hintText: 'e.g. 30, 200',
                 ),
               ),
               const SizedBox(height: 16),

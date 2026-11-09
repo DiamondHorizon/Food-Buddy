@@ -86,7 +86,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Breakfast',
       'instructions': '1. Heat the oven to 220C/200C fan/gas 7. Rub 1 tbsp of the oil over a large, shallow roasting tin. Put the hash browns on one half of the tin and line the sausages up on the other. Cook for 15 mins, then flip the hash browns, turn the sausages and return to the oven for 10-15 mins until the hash browns are golden, and the sausages browned. Push everything together to make room in the tin, then lay the bacon rashers in the space and return to the oven for 10-15 mins or until the bacon fat is crisp and sizzling. 2. About 10 mins before the bacon is ready, heat 1 tbsp of oil with the butter in a frying pan until sizzling. Scatter in the mushrooms and season with salt and pepper. Fry over a high heat, tossing occasionally until softened and any liquid released has evaporated (about 5-10 mins), then tip onto a warm plate. Wipe out the pan, heat the rest of the oil and fry the eggs however you like them. While everything is cooking heat the baked beans in a saucepan or in the microwave and lightly toast the bread, then spread the toast with butter. 3. To assemble, split the sausages in half and lay three halves on each of two slices of toast. Top the sausages with the bacon then spoon over the mushrooms and top with a second slice of toast. Spread over ketchup or brown sauce (or both), then squash the hash browns down a little and top each toast with two hash browns. Top the hash browns with an egg each, then top with the last slices of toast (spread with more sauce, if you like). Press down lightly on each sandwich and serve as they are or cut in half to get a runny yolk oozing out of each sandwich. Serve with a bowl of baked beans on the side.',
-      'ingredients': '3 tbsp sunflower oil, 4 frozen hash browns, 3 pork sausages, 4 rashers smoked back bacon, 15g butter plus extra for spreading, 100g chestnut mushrooms sliced, 2 eggs, 400g can baked beans, 6 slices white bread, butter ketchup and brown sauce, to serve',
+      'ingredients': '3 tbsp sunflower oil, 4 frozen hash browns, 3 pork sausages, 4 rashers smoked back bacon, 15g butter plus extra for spreading, 100g chestnut mushrooms sliced, 2 eggs, 400g can baked beans, 6 slices white bread, butter ketchup and brown sauce to serve',
       'dietRestriction': 'None',
       'duration': 55,
       'calories': 991.0,
@@ -110,7 +110,7 @@ class RecipeDatabase {
       'protein': 8.0,
       'carbs': 54.0,
       'fat': 31.0,
-      'difficulty': 'Easy',
+      'difficulty': 'Medium',
       'servingSize': 8
     });
 
@@ -120,7 +120,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Breakfast',
       'instructions': '1. Tip the potatoes into a large pan of cold salted water, then bring to the boil and cook for 6-8 mins until just tender. Drain well and leave to steam-dry for 10 mins. 2. Meanwhile, heat half the oil and all the butter in a large frying pan over a medium heat and fry the leeks, kale stalks and sage sprig for 10-12 mins until softened to the point of falling apart. Stir in the garlic and cook for 3 mins more before mixing in the kale leaves. Cook for another 5 mins until the leaves have reduced in volume and turned dark green. Scrape the mixture into a bowl and set aside. 3. Heat the remaining oil in the frying pan over a high heat and tip in the boiled potatoes, stirring to coat in the oil. Fry for 15-20 mins until golden and crispy. Return the leek mixture to the pan and stir to combine. Season to taste and divide the hash between plates. 4. Meanwhile, cook the eggs. Heat the oil in a separate pan over a medium-high heat and fry the sage leaves for 1-2 mins until darkened and crispy. Remove to a plate lined with a sheet of kitchen paper to drain. Return the pan to the heat and crack in the eggs. Fry, basting occasionally in the sage oil, until crispy at the edges, about 2-3 mins. Top each plate of hash with a crispy fried egg, and scatter over the fried sage leaves. Garnish with a little grated cheese, if you like, and season with black pepper to serve.',
-      'ingredients': '800g Maris Piper potatoes cut into large chunks, 4 tbsp olive oil, 25g butter, 2 leeks finely sliced, 75g kale thick stalks finely chopped, leaves torn, 1 sage sprig, 3 garlic cloves finely sliced, grated parmesan or vegetarian alternative, to serve (optional), 2 tbsp olive oil, 10 sage leaves, 4 eggs',
+      'ingredients': '800g Maris Piper potatoes cut into large chunks, 4 tbsp olive oil, 25g butter, 2 leeks finely sliced, 75g kale thick stalks finely chopped with leaves torn, 1 sage sprig, 3 garlic cloves finely sliced, grated parmesan or vegetarian alternative to serve (optional), 2 tbsp olive oil, 10 sage leaves, 4 eggs',
       'dietRestriction': 'Vegetarian, Gluten-free',
       'duration': 60,
       'calories': 431.0,
@@ -137,14 +137,14 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Breakfast',
       'instructions': '1. Heat the air fryer to 180C with a heatproof non-stick pan inside (a round pan will create a more traditional omelette shape). Put the butter in the pan and heat for 30 seconds more. 2. Beat the eggs with a few cracks of black pepper, then mix in your chosen fillings. If using cheese, add a handful to the eggs, leaving the rest to sprinkle on at the end. 3. Pour the egg mixture into the pan and cook for 8-10 mins until puffed up and golden. If you have reserved cheese, sprinkle it over the omelette. Serve with salad.',
-      'ingredients': '15g  butter, 2 eggs, fillings of your choice, such as grated cheese, fried mushrooms, wilted spinach, crumbled feta or chopped ham, salad to serve',
+      'ingredients': '15g  butter, 2 eggs, fillings of your choice such as grated cheese fried mushrooms wilted spinach crumbled feta or chopped ham, salad to serve',
       'dietRestriction': 'Vegetarian, Gluten-free',
       'duration': 12,
       'calories': 251.0,
       'protein': 13.0,
       'carbs': 0.1,
       'fat': 22.0,
-      'difficulty': 'Easy',
+      'difficulty': 'medium',
       'servingSize': 1
     });
 
@@ -171,7 +171,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Breakfast',
       'instructions': '1. Cook the oats and milk in a pan over a medium-low heat for 4-6 mins, stirring continuously until thickened and creamy. Remove from the heat and sift in the protein powder. Add a splash more milk or water to loosen, if you prefer a thinner porridge. 2. Divide between bowls and top with any toppings of your choice.',
-      'ingredients': '80g  porridge oats, 500ml  milk (any kind), 30g  protein powder (vanilla, chocolate or berry work well), 4 tbsp  Greek-style yogurt, 2 tbsp  pumpkin, chia, flax or sunflower seeds, 2 tbsp  nut or seed butter, 100g  frozen or fresh fruit (like berries, bananas or sliced apples), honey or other syrup, to serve',
+      'ingredients': '80g  porridge oats, 500ml  milk (any kind), 30g  protein powder (vanilla chocolate or berry work well), 4 tbsp  Greek-style yogurt, 2 tbsp  pumpkin chia flax or sunflower seeds, 2 tbsp nut or seed butter, 100g frozen or fresh fruit (like berries bananas or sliced apples), honey or other syrup to serve',
       'dietRestriction': 'Vegetarian',
       'duration': 20,
       'calories': 376.0,
@@ -273,7 +273,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Lunch',
       'instructions': '1. Heat a large saucepan and dry-fry 2 tsp cumin seeds and a pinch of chilli flakes for 1 min, or until they start to jump around the pan and release their aromas. 2. Scoop out about half with a spoon and set aside. Add 2 tbsp olive oil, 600g coarsely grated carrots, 140g split red lentils, 1l hot vegetable stock and 125ml milk to the pan and bring to the boil. 3. Simmer for 15 mins until the lentils have swollen and softened. 4. Whizz the soup with a stick blender or in a food processor until smooth (or leave it chunky if you prefer). 5. Season to taste and finish with a dollop of plain yogurt and a sprinkling of the reserved toasted spices. Serve with warmed naan breads.',
-      'ingredients': '2 tsp cumin seeds, pinch chilli flakes, 2 tbsp olive oil, 600g carrots washed and coarsely grated (no need to peel), 140g split red lentils, 1l hot vegetable stock (from a cube is fine), 125ml milk (to make it dairy-free, see \'try\' below), plain yogurt and naan bread, to serve',
+      'ingredients': '2 tsp cumin seeds, pinch chilli flakes, 2 tbsp olive oil, 600g carrots washed and coarsely grated (no need to peel), 140g split red lentils, 1l hot vegetable stock (from a cube is fine), 125ml milk (to make it dairy-free), plain yogurt and naan bread to serve',
       'dietRestriction': 'Vegetarian, Dairy-free',
       'duration': 25,
       'calories': 263.0,
@@ -307,7 +307,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Lunch',
       'instructions': '1. Pour the tamari into a large dish and stir in the curry powder, cumin, garlic and honey. Mix well. Slice the chicken breasts in half horizontally to make 4 fillets in total, then add to the marinade and mix well to coat. Set aside in the fridge for at least 1 hr, or overnight, to allow the flavours to penetrate the chicken. 2. Meanwhile, mix the peanut butter with the chilli sauce, lime juice, and 1 tbsp water to make a spoonable sauce. When ready to cook the chicken, wipe a large non-stick frying pan with a little oil. Add the chicken and cook, covered with a lid, for 5-6 mins on a medium heat, turning the fillets over for the last min, until cooked but still moist. Set aside, covered, to rest for a few mins. 3. While the chicken rests, toss the lettuce wedges with the cucumber, shallot, coriander and pomegranate, and pile onto plates. Spoon over a little sauce. Slice the chicken, pile on top of the salad and spoon over the remaining sauce. Eat while the chicken is still warm.',
-      'ingredients': '1 tbsp tamari, 1 tsp medium curry powder, ¼ tsp ground cumin, 1 garlic clove finely grated, 1 tsp clear honey, 2 skinless chicken breast fillets (or use turkey breast), 1 tbsp crunchy peanut butter (choose a sugar-free version with no palm oil, if possible), 1 tbsp sweet chilli sauce, 1 tbsp lime juice, sunflower oil for wiping the pan, 2 Little Gem lettuce hearts, cut into wedges, ¼ cucumber halved and sliced, 1 banana shallot halved and thinly sliced, coriander chopped, seeds from ½ pomegranate',
+      'ingredients': '1 tbsp tamari, 1 tsp medium curry powder, ¼ tsp ground cumin, 1 garlic clove finely grated, 1 tsp clear honey, 2 skinless chicken breast fillets (or use turkey breast), 1 tbsp crunchy peanut butter (choose a sugar-free version with no palm oil if possible), 1 tbsp sweet chilli sauce, 1 tbsp lime juice, sunflower oil for wiping the pan, 2 Little Gem lettuce hearts cut into wedges, ¼ cucumber halved and sliced, 1 banana shallot halved and thinly sliced, coriander chopped, seeds from ½ pomegranate',
       'dietRestriction': 'None',
       'duration': 25,
       'calories': 353.0,
@@ -324,7 +324,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Lunch',
       'instructions': '1. Heat the oil in a large flameproof casserole dish or saucepan over a medium-high heat. Fry the onions with a pinch of salt for 7 mins, or until softened and just caramelised. Add the garlic, chilli and ras el hanout, and cook for 1 min more. 2. Stir in the squash and lentils. Pour over the stock and season to taste. Bring to the boil, then reduce the heat to a simmer and cook, covered, for 25 mins or until the squash is soft. Blitz the soup with a stick blender until smooth, then season to taste. To freeze, leave to cool completely and transfer to large freezerproof bags. 3. Stir in the coriander leaves and ladle the soup into bowls. Serve topped with the dukkah, yogurt and extra coriander leaves.',
-      'ingredients': '2 tbsp olive oil, 2 onions finely chopped, 2 garlic cloves crushed, ¼ tsp hot chilli powder, 1 tbsp ras el hanout, 1 butternut squash peeled and cut into 2cm pieces, 100g red lentils, 1l hot vegetable stock, 1 small bunch coriander leaves chopped, plus extra to serve, dukkah (see tip) and natural yogurt, to serve',
+      'ingredients': '2 tbsp olive oil, 2 onions finely chopped, 2 garlic cloves crushed, ¼ tsp hot chilli powder, 1 tbsp ras el hanout, 1 butternut squash peeled and cut into 2cm pieces, 100g red lentils, 1l hot vegetable stock, 1 small bunch coriander leaves chopped plus extra to serve, dukkah (see tip) and natural yogurt to serve',
       'dietRestriction': 'Vegetarian',
       'duration': 50,
       'calories': 167.0,
@@ -341,7 +341,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Lunch',
       'instructions': '1. Heat the oven to 200C/180C fan/gas 6 or if using an air fryer heat to 200C. Prick the sweet potatoes all over with a fork, then put on a baking tray and roast in the oven for 45 mins or in air fryer basket for 50 mins or until tender when pierced with a knife. 2. Meanwhile, melt the coconut oil in a large saucepan over medium heat. Add the cumin seeds and fry for 1 min until fragrant, then add the onion and fry for 7-10 mins until softened. 3. Put the garlic, ginger and green chilli into the pan, and cook for 2-3 mins. Add the spices and tikka masala paste and cook for a further 2 mins until fragrant, then tip in the tomatoes. Bring to a simmer, then tip in the Merchant Gourmet Jumbo Chickpeas and cook for a further 20 mins until thickened. Season. 4. Put the roasted sweet potatoes on four plates and cut open lengthways. Spoon over the chickpea curry and squeeze over the lemon wedges. Season, then scatter with coriander before serving.',
-      'ingredients': '4 sweet potatoes, 1 tbsp coconut oil, 1 ½ tsp  cumin seeds, 1 large onion diced, 2 garlic cloves crushed, thumb-sized piece of ginger finely grated, 1 green chilli finely chopped, 1 tsp garam masala, 1 tsp ground coriander, ½ tsp turmeric, 2 tbsp tikka masala paste, 2 x 400g can  chopped tomatoes, 800g Merchant Gourmet Jumbo Chickpeas, lemon wedges and coriander leaves, to serve',
+      'ingredients': '4 sweet potatoes, 1 tbsp coconut oil, 1 ½ tsp  cumin seeds, 1 large onion diced, 2 garlic cloves crushed, thumb-sized piece of ginger finely grated, 1 green chilli finely chopped, 1 tsp garam masala, 1 tsp ground coriander, ½ tsp turmeric, 2 tbsp tikka masala paste, 2 x 400g can  chopped tomatoes, 800g Merchant Gourmet Jumbo Chickpeas, lemon wedges and coriander leaves to serve',
       'dietRestriction': 'Vegan, Gluten-free',
       'duration': 60,
       'calories': 276.0,
@@ -358,7 +358,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Lunch',
       'instructions': '1. Heat the oil in a large frying pan over a low-medium heat. Add the onion and a pinch of salt and cook slowly, stirring occasionally, until softened and just starting to colour. Add the garlic, ginger and coriander stalks and cook for a further 2 mins, until fragrant. 2. Add the spices to the pan and cook for another 1 min, by which point everything should smell aromatic. Tip in the chopped tomatoes and kidney beans in their water, then bring to the boil. 3. Turn down the heat and simmer for 15 mins until the curry is nice and thick. Season to taste, then serve with the basmati rice and the coriander leaves.',
-      'ingredients': '1 tbsp vegetable oil, 1 onion finely chopped, 2 garlic cloves finely chopped, thumb-sized piece of ginger peeled and finely chopped, 1 small pack coriander stalks finely chopped, leaves roughly shredded, 1 tsp ground cumin, 1 tsp ground paprika, 2 tsp garam masala, 400g can chopped tomatoes, 400g can kidney beans in water, cooked basmati rice to serve',
+      'ingredients': '1 tbsp vegetable oil, 1 onion finely chopped, 2 garlic cloves finely chopped, thumb-sized piece of ginger peeled and finely chopped, 1 small pack coriander stalks finely chopped leaves roughly shredded, 1 tsp ground cumin, 1 tsp ground paprika, 2 tsp garam masala, 400g can chopped tomatoes, 400g can kidney beans in water, cooked basmati rice to serve',
       'dietRestriction': 'Vegan, Gluten-free',
       'duration': 35,
       'calories': 282.0,
@@ -375,7 +375,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Lunch',
       'instructions': '1. Put the potatoes in a large pan with just enough water to cover them and crumble in the stock cubes. Bring to the boil, then cover and cook for 5 mins. Add the courgettes, put the lid back on and cook for 5 mins more. Throw in the spring onions, cover and cook for a final 5 mins. 2. Take off the heat, then stir in the cheese and season with the nutmeg, salt and pepper. Whizz to a thick soup, adding more hot water until you get the consistency you like. Serve scattered with extra grated cheddar, spring onions and nutmeg or pepper. Or cool and freeze in freezer bags or containers with good lids for up to 3 months.',
-      'ingredients': '500g potato unpeeled and roughly chopped, 2 vegetable stock cubes, 1kg courgettes roughly chopped, bunch spring onion sliced - save 1 for serving, if eating straight away, 100g extra-mature cheddar or vegetarian alternative, grated, plus a little extra to serve, good grating fresh nutmeg plus extra to serve',
+      'ingredients': '500g potato unpeeled and roughly chopped, 2 vegetable stock cubes, 1kg courgettes roughly chopped, bunch spring onion sliced - save 1 for serving if eating straight away, 100g extra-mature cheddar or vegetarian alternative grated plus a little extra to serve, good grating fresh nutmeg plus extra to serve',
       'dietRestriction': 'Vegetarian',
       'duration': 30,
       'calories': 131.0,
@@ -409,7 +409,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Dinner',
       'instructions': '1. Heat 2 tbsp of the oil in a pan over a medium heat and fry the onion gently for 10-12 mins. Add the garlic and chilli flakes and cook for 1 min. Tip in the tomatoes and sugar and season to taste. Simmer uncovered for 20 mins or until thickened, then stir through the mascarpone. 2. Heat 1 tbsp of oil in a non-stick frying pan. Season the chicken and fry for 5-7 mins or until the chicken is cooked through. 3. Heat the oven to 220C/200C fan/gas 7. Cook the penne following pack instructions. Drain and toss with the remaining oil. Tip the pasta into a medium sized ovenproof dish. Stir in the chicken and pour over the sauce. Top with the cheddar, mozzarella and parsley. Bake for 20 mins or until golden brown and bubbling.',
-      'ingredients': '4 tbsp olive oil, 1 onion finely chopped, 2 garlic cloves crushed, ¼ tsp chilli flakes, 2 x 400g cans chopped tomatoes, 1 tsp caster sugar, 6 tbsp mascarpone, 4 skinless chicken breasts, sliced into strips, 300g penne, 70g mature cheddar grated, 50g grated mozzarella, ½ small bunch of parsley finely chopped',
+      'ingredients': '4 tbsp olive oil, 1 onion finely chopped, 2 garlic cloves crushed, ¼ tsp chilli flakes, 2 x 400g cans chopped tomatoes, 1 tsp caster sugar, 6 tbsp mascarpone, 4 skinless chicken breasts sliced into strips, 300g penne, 70g mature cheddar grated, 50g grated mozzarella, ½ small bunch of parsley finely chopped',
       'dietRestriction': 'None',
       'duration': 75,
       'calories': 575.0,
@@ -426,7 +426,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Dinner',
       'instructions': '1. Heat the oil in a flameproof casserole dish or large frying pan over a medium heat. Add the onion and a generous pinch of salt and fry for 8-10 mins, or until the onion has turned golden brown and sticky. 2. Add the garlic and ginger, cooking for a further minute. 3. Chop the chicken into chunky 3cm pieces, add to the pan and fry for 5 mins before stirring through the spice paste and tomatoes, along with 250ml water. Bring to the boil, lower to a simmer and cook on a gentle heat uncovered for 25-30 mins or until rich and slightly reduced. 4. Stir though the yogurt, coriander and ground almonds, season and serve with warm naan or fluffy basmati rice.',
-      'ingredients': '2 tbsp sunflower oil, 1 onion thinly sliced, 2 garlic cloves crushed, thumb-sized piece of ginger grated, 6 chicken thighs boneless and skinless, 3 tbsp medium spice paste (tikka works well), 400g can chopped tomatoes, 100g Greek yogurt, 1 small bunch of coriander leaves chopped, 50g ground almonds, naan breads or cooked basmati rice, to serve',
+      'ingredients': '2 tbsp sunflower oil, 1 onion thinly sliced, 2 garlic cloves crushed, thumb-sized piece of ginger grated, 6 chicken thighs boneless and skinless, 3 tbsp medium spice paste (tikka works well), 400g can chopped tomatoes, 100g Greek yogurt, 1 small bunch of coriander leaves chopped, 50g ground almonds, naan breads or cooked basmati rice to serve',
       'dietRestriction': 'Gluten-free',
       'duration': 50,
       'calories': 354.0,
@@ -443,7 +443,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Dinner',
       'instructions': '1. Heat 2 tbsp of the oil in a saucepan over a medium heat. Fry the onion with a pinch of salt for 7 mins. Add the garlic, chilli and rosemary, and cook for 1 min more. Tip in the tomatoes and sugar, and simmer for 20 mins. 2. Heat the remaining oil in a medium frying pan over a medium heat. Squeeze the sausagemeat from the skins and fry, breaking it up with a wooden spoon, for 5-7 mins until golden. Add to the sauce with the milk and lemon zest, then simmer for a further 5 mins. To freeze, leave to cool completely and transfer to large freezerproof bags. 3. Cook the pasta following pack instructions. Drain and toss with the sauce. Scatter over the parmesan and parsley leaves to serve.',
-      'ingredients': '3 tbsp olive oil, 1 onion finely chopped, 2 large garlic cloves crushed, ¼ tsp chilli flakes, 2 rosemary sprigs, leaves finely chopped, 2 x 400g cans chopped tomatoes, 1 tbsp brown sugar, 6 pork sausages, 150ml whole milk, 1 lemon zested, 350g rigatoni pasta, grated parmesan and ½ small bunch parsley, leaves roughly chopped, to serve',
+      'ingredients': '3 tbsp olive oil, 1 onion finely chopped, 2 large garlic cloves crushed, ¼ tsp chilli flakes, 2 rosemary sprigs leaves finely chopped, 2 x 400g cans chopped tomatoes, 1 tbsp brown sugar, 6 pork sausages, 150ml whole milk, 1 lemon zested, 350g rigatoni pasta, grated parmesan and ½ small bunch parsley leaves roughly chopped to serve',
       'dietRestriction': 'None',
       'duration': 50,
       'calories': 601.0,
@@ -477,7 +477,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Dinner',
       'instructions': '1. Pour the milk into a large pan and add the flour and butter. Set over a medium heat and whisk continuously until you have a smooth, thick white sauce. Remove from the heat, add the mustard, most of the cheese (save a handful for the top), peas and parsley. 2. Meanwhile, boil the pasta in a large pan of water following pack instructions until just cooked. Drain. 3. Heat the oven to 200C/180C fan/gas 6. Tip the pasta into the sauce and add half the fish, stir everything together then tip into a large baking dish. Top with the rest of the fish, pushing it into the pasta a little, then scatter with the remaining cheese. Bake for 30 mins until golden, then serve with salad, if you like. Can be chilled and eaten within three days or frozen for up to a month. Defrost in the fridge, then reheat in a microwave or oven until piping hot.',
-      'ingredients': '650ml milk, 40g plain flour, 40g butter, 2 tsp Dijon mustard, 150g mature  cheddar grated, 180g frozen peas, handful of  parsley chopped, 300g macaroni, 300g fish pie mix (smoked fish, white fish and salmon), green salad to serve (optional)',
+      'ingredients': '650ml milk, 40g plain flour, 40g butter, 2 tsp Dijon mustard, 150g mature cheddar grated, 180g frozen peas, handful of  parsley chopped, 300g macaroni, 300g fish pie mix (smoked fish white fish and salmon), green salad to serve (optional)',
       'dietRestriction': 'None',
       'duration': 50,
       'calories': 504.0,
@@ -511,7 +511,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Dinner',
       'instructions': '1. Heat the oil in a large shallow casserole or frying pan. Add the chicken and fry for 5 mins over a medium heat until golden all over. Remove and set aside on a plate. 2. Put the onion and peppers in the same pan and fry over a medium heat for 8-10 mins. Add the garlic, dried herbs and spices and cook for 1 min. Add the tomato purée and cook for 2 mins. Return the chicken to the pan and pour in the cream, stirring to combine. Season to taste. 3. Cook the pasta following pack instructions, then drain and reserve 150ml of the cooking water. Add the pasta to the pan with 50ml of the water and stir everything together over the heat. Add a little more water to loosen if needed. Season to taste and stir through the parsley. Divide between six bowls and top with a little cheese and extra chopped parsley, if you like. This can be packed into a lunchbox and eaten cold, too.',
-      'ingredients': '2 tbsp  olive oil, 2 large skinless chicken breasts cut into strips, 1 onion thinly sliced, 1 red pepper deseeded and sliced, 1 yellow pepper deseeded and sliced, 1 garlic clove crushed, 1⁄4 tsp chilli powder, 1 heaped tsp sweet smoked paprika, 1⁄2 tsp dried oregano, 1 tsp ground coriander, 1⁄2 tsp ground cumin, 3 tbsp tomato purée, 80ml double cream, 350g penne or rigatoni pasta, 1⁄2 small bunch of flat-leaf parsley finely chopped, grated parmesan or cheddar, to serve',
+      'ingredients': '2 tbsp  olive oil, 2 large skinless chicken breasts cut into strips, 1 onion thinly sliced, 1 red pepper deseeded and sliced, 1 yellow pepper deseeded and sliced, 1 garlic clove crushed, 1⁄4 tsp chilli powder, 1 heaped tsp sweet smoked paprika, 1⁄2 tsp dried oregano, 1 tsp ground coriander, 1⁄2 tsp ground cumin, 3 tbsp tomato purée, 80ml double cream, 350g penne or rigatoni pasta, 1⁄2 small bunch of flat-leaf parsley finely chopped, grated parmesan or cheddar to serve',
       'dietRestriction': 'None',
       'duration': 35,
       'calories': 395.0,
@@ -562,7 +562,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Dinner',
       'instructions': '1. Heat the oven to 200C/180C fan/gas 6. Bring a medium pan of water to the boil. Add the potatoes and cook for 8 mins. Drain and leave to steam-dry in a colander for a few minutes. Toss the potatoes with ½ of the oil and plenty of seasoning in a baking tray. Put in the oven for 20 mins, tossing halfway through the cooking time. 2. Meanwhile, heat the remaining oil in a frying pan over a medium heat. Add the leek and fry for 5 mins, or until beginning to soften. Stir through the garlic for 1 min, then add the cream, capers and 75ml hot water, then bring to the boil. Stir through the chives. 3. Heat the grill to high. Pour the creamy leek mixture over the potatoes, then sit the salmon fillets on top. Grill for 7-8 mins, or until just cooked through. Serve topped with extra chives and capers and a salad on the side, if you like.',
-      'ingredients': '250g baby potatoes thickly sliced, 2 tbsp olive oil, 1 leek halved, washed and sliced, 1 garlic clove crushed, 70ml double cream, 1 tbsp capers plus extra to serve, 1 tbsp chives plus extra to serve, 2 skinless salmon fillets, mixed rocket salad to serve (optional)',
+      'ingredients': '250g baby potatoes thickly sliced, 2 tbsp olive oil, 1 leek halved washed and sliced, 1 garlic clove crushed, 70ml double cream, 1 tbsp capers plus extra to serve, 1 tbsp chives plus extra to serve, 2 skinless salmon fillets, mixed rocket salad to serve (optional)',
       'dietRestriction': 'Gluten-free',
       'duration': 40,
       'calories': 696.0,
@@ -630,7 +630,7 @@ class RecipeDatabase {
       'type': 'Appetizer',
       'meal': 'Dinner',
       'instructions': '1. Bring a kettle to the boil, then pour the water over the dried porcini just to cover. Heat half the butter in a saucepan, then gently sizzle the onion, garlic and thyme for 5 mins until softened and starting to brown. Drain the porcini, reserving the juice, then add to the onion with the mixed wild mushrooms. Leave to cook for 5 mins until they go limp. 2. Pour over the stock and the reserved juices, bring to the boil, then simmer for 20 mins. Stir in crème fraîche, then simmer for a few mins more. Blitz the soup with a hand blender or liquidiser, pass through a fine sieve, then set aside. 3. Heat the remaining butter in a frying pan, fry the bread cubes until golden, then drain on kitchen paper. To serve, heat the soup and froth up with a hand blender, if you like. Ladle the soup into bowls, scatter over the croûtons and chives and drizzle with truffle oil.',
-      'ingredients': '25g dried porcini (ceps), 50g butter, 1 onion finely chopped, 1 garlic clove sliced, thyme sprigs, 400g mixed wild mushrooms, 850ml vegetable stock, 200ml tub crème fraîche, 4 slices white bread about 100g, cubed, chives and truffle oil, to serve',
+      'ingredients': '25g dried porcini (ceps), 50g butter, 1 onion finely chopped, 1 garlic clove sliced, thyme sprigs, 400g mixed wild mushrooms, 850ml vegetable stock, 200ml tub crème fraîche, 4 slices white bread about 100g cubed, chives and truffle oil to serve',
       'dietRestriction': 'Vegetarian',
       'duration': 70,
       'calories': 347.0,
@@ -681,7 +681,7 @@ class RecipeDatabase {
       'type': 'Appetizer',
       'meal': 'Dinner',
       'instructions': '1. Blitz ¾ of the chickpeas and 120ml of the oil with the rest of the hummus ingredients and a good amount of seasoning in a food processor. Add a little water if it is too thick. Spoon the hummus into a serving bowl or spread it onto a plate. Can be made up to two days in advance and kept in the fridge. 2. Dry the rest of the chickpeas on kitchen paper as much as possible. Heat the remaining oil in a frying pan over a medium heat. Add the chickpeas and a large pinch of salt, and fry until golden, around 4 mins. Drain on kitchen paper. 3. Drizzle some oil over the hummus, then sprinkle with the spices, parsley and pomegranate seeds. Scatter the fried chickpeas on top and serve with crudités and warm pitta breads.',
-      'ingredients': '700g chickpeas drained, 135ml extra virgin olive oil plus extra for drizzling, 2 garlic cloves roughly chopped, 1 tbsp tahini, 1½ lemons juiced, ½ tsp smoked paprika, ½ tsp sumac, ½ small pack parsley roughly chopped, 40g pomegranate seeds, crudités and warm pittas, to serve',
+      'ingredients': '700g chickpeas drained, 135ml extra virgin olive oil plus extra for drizzling, 2 garlic cloves roughly chopped, 1 tbsp tahini, 1½ lemons juiced, ½ tsp smoked paprika, ½ tsp sumac, ½ small pack parsley roughly chopped, 40g pomegranate seeds, crudités and warm pittas to serve',
       'dietRestriction': 'Vegan',
       'duration': 25,
       'calories': 242.0,
@@ -749,7 +749,7 @@ class RecipeDatabase {
       'type': 'Dessert',
       'meal': 'Dinner',
       'instructions': '1. Butter and line a 15-20cm tin with baking parchment. In a large saucepan, melt the butter, sugar, syrup and cocoa. Stir through the biscuits and raisins. 2. Pour the mixture into the prepared tin and press down, then smooth the top with the back of a spoon. Microwave both chocolates in short 20 second bursts, stirring frequently, until melted. Pour them over the mixture in the tin. Use a palette knife or spoon to smooth over, so it\'s completely coated in chocolate. 3. Put the tin into the fridge and leave for about 2 hrs to set, or overnight. Run a kitchen knife under the hot tap then cut into squares.',
-      'ingredients': '150g butter cubed, plus extra for the tin, 3 tbsp caster sugar, 3 tbsp golden syrup, 6 tsp cocoa powder, 225g biscuits crushed, handful of raisins, 110g milk chocolate, 110g dark chocolate',
+      'ingredients': '150g butter cubed plus extra for the tin, 3 tbsp sugar, 3 tbsp syrup, 6 tsp cocoa powder, 225g biscuits crushed, handful of raisins, 110g milk chocolate, 110g dark chocolate',
       'dietRestriction': 'Vegetarian',
       'duration': 17,
       'calories': 266.0,
@@ -766,7 +766,7 @@ class RecipeDatabase {
       'type': 'Dessert',
       'meal': 'Dinner',
       'instructions': '1. Crush the biscuits in a food processor until completely ground. Add butter and whizz again until you have the desired crumbly consistency. 2. Grease and line the base of a 23cm deep, loose-bottomed cake tin. Add the biscuit mixture to the cake tin and pat it flat. Leave to set in the fridge for approximately 30 mins. 3. Begin melting the chocolate in a heatproof glass bowl over a small pan of hot water on a low heat. Stir occasionally to prevent sticking. Remove from the heat and leave to cool for 10 mins until barely warm but still liquid. 4. Meanwhile whisk the cream cheese and mascarpone together. Add double cream and keep whisking until the mixture is just holding its own shape. Finally, add the melted chocolate and whisk until just combined. 5. Spoon the mixture over the cooled and set biscuit base, then smooth the top. Return to the fridge to cool for at least 6 hrs until the topping is set. Finally, decorate with fruit.',
-      'ingredients': '300g digestive biscuits (make sure the products are free from any trace of nuts when preparing for someone with a nut allergy), 150g unsalted butter melted, plus extra to grease, 400g white chocolate broken into pieces, 300g full-fat cream cheese (we used Philadelphia), 250g mascarpone, 300ml double cream, 200g strawberries or raspberries, to serve',
+      'ingredients': '300g digestive biscuits, 150g unsalted butter melted plus extra to grease, 400g white chocolate broken into pieces, 300g full-fat cream cheese (we used Philadelphia), 250g mascarpone, 300ml double cream, 200g strawberries or raspberries to serve',
       'dietRestriction': 'Vegetarian',
       'duration': 25,
       'calories': 801.0,
@@ -783,14 +783,14 @@ class RecipeDatabase {
       'type': 'Dessert',
       'meal': 'Dinner',
       'instructions': '1. Heat oven to 170C/150C fan/gas 3. Butter a deep, loose-bottomed, 18cm cake tin and line the base with baking parchment. 2. Beat the butter and caster sugar together with an electric whisk until fluffy and pale in colour. Crack the eggs in one at a time, beating well after each addition, then stir in the lemon zest. Fold in the flour, baking powder and ½ tsp salt, then fold in the yogurt. 3. Spoon the mixture into the lined tin, smoothing the top with a spatula. Bake in the centre of the oven for 50-55 mins, or until golden brown on top and firm to the touch. Cool in the tin for 10 mins before turning out onto a wire rack to cool completely. Will keep in an airtight container for up to four days, or in the freezer for up to a month. 4. When you’re ready to decorate, sieve the icing sugar into a bowl and beat in enough of the lemon juice to create a thick icing. Set the cake on a serving plate or cake stand, then spoon over the icing, allowing it to drip down the sides a little. Top with the lemon zest or candied peel, if using (see below), and cut into generous wedges to serve. 5. To make candied lemon peel, peel large, wide strips from the lemons using a vegetable peeler. Remove any pith with a knife, then julienne the peel into very thin matchsticks. Tip the granulated sugar into a saucepan with 200ml water and set over a medium heat until the sugar has dissolved. Add the lemon peel and simmer gently for 15 mins, then scoop the peel out using a slotted spoon and set on a piece of kitchen paper to cool. Use to decorate the top of your cake.',
-      'ingredients': '175g unsalted butter softened, plus extra for the tin, 175g golden caster sugar, 3 large eggs, 3 large unwaxed lemons zested, plus 4-4 ½ tbsp juice, 250g self-raising flour, ½ tsp baking powder, 100g Greek yogurt, 400g icing sugar, lemon zest or candied peel, to serve (optional), 2 large lemons, 200g granulated sugar',
+      'ingredients': '175g unsalted butter softened plus extra for the tin, 175g golden caster sugar, 3 large eggs, 3 large unwaxed lemons zested, plus 4-4 ½ tbsp juice, 250g self-raising flour, ½ tsp baking powder, 100g Greek yogurt, 400g icing sugar lemon zest or candied peel to serve (optional), 2 large lemons, 200g granulated sugar',
       'dietRestriction': 'Vegetarian',
       'duration': 80,
       'calories': 409.0,
       'protein': 5.0,
       'carbs': 64.0,
       'fat': 15.0,
-      'difficulty': 'Easy',
+      'difficulty': 'Hard',
       'servingSize': 10
     });
 
@@ -828,22 +828,6 @@ class RecipeDatabase {
       'servingSize': 8
     });
 
-    // 46. Two-minute breakfast smoothie - https://www.bbcgoodfood.com/recipes/two-minute-breakfast-smoothie
-    await _insertIfMissing(db, {
-      'name': 'Two-minute breakfast smoothie',
-      'type': 'Drink',
-      'meal': 'Breakfast',
-      'instructions': '1. Put all the ingredients in a blender and whizz for 1 min until smooth. 2. Pour the banana oat smoothie into two glasses to serve.',
-      'ingredients': '1 banana, 1 tbsp porridge oats, 80g soft fruit (whatever you have – strawberries, blueberries, and mango all work well), 150ml milk, 1 tsp honey, 1 tsp vanilla extract',
-      'dietRestriction': 'Vegetarian',
-      'duration': 2,
-      'calories': 146.0,
-      'protein': 4.0,
-      'carbs': 22.0,
-      'fat': 4.0,
-      'difficulty': 'Easy',
-      'servingSize': 2
-    });
 
     // 47. Breakfast smoothie - https://www.bbcgoodfood.com/recipes/breakfast-smoothie
     await _insertIfMissing(db, {
@@ -851,7 +835,7 @@ class RecipeDatabase {
       'type': 'Drink',
       'meal': 'Breakfast',
       'instructions': '1. Slice the banana into your blender or food processor and add the berries of your choice. Whizz until smooth. With the blades whirring, pour in juice or water to make the consistency you like. Toss a few extra fruits on top, drizzle with honey and serve.',
-      'ingredients': '1 small ripe banana, about 140g blackberries, blueberries, raspberries or strawberries (or use a mix), plus extra to serve, apple juice or mineral water, optional, runny honey to serve',
+      'ingredients': '1 small ripe banana, about 140g blackberries blueberries raspberries or strawberries (or use a mix), apple juice or mineral water, 1 tsp runny honey to serve',
       'dietRestriction': 'Gluten-free',
       'duration': 5,
       'calories': 124.0,
@@ -868,7 +852,7 @@ class RecipeDatabase {
       'type': 'Drink',
       'meal': 'Breakfast',
       'instructions': '1. Whizz 300ml water and the ingredients in a blender until smooth.',
-      'ingredients': '1 handful spinach (about 50g/2oz), roughly chopped, 100g broccoli florets, roughly chopped, 2 celery sticks, 4 tbsp desiccated coconut, 1 banana, 300ml rice milk (good dairy alternative - we used one from Rude Health), ¼ tsp spirulina or 1 scoop of greens powder or vegan protein powder (optional)',
+      'ingredients': '1 handful spinach (about 50g/2oz) roughly chopped, 100g broccoli florets roughly chopped, 2 celery sticks, 4 tbsp desiccated coconut, 1 banana, 300ml rice milk (good dairy alternative - we used one from Rude Health), ¼ tsp spirulina or 1 scoop of greens powder or vegan protein powder (optional)',
       'dietRestriction': 'Vegan',
       'duration': 10,
       'calories': 243.0,
@@ -941,7 +925,7 @@ class RecipeDatabase {
       'carbs': 60.0,
       'fat': 10.0,
       'difficulty': 'Easy',
-      'servingSize': 1
+      'servingSize': 3
     });
     await _insertIfMissing(db, {
       'name': 'College Ramen',
@@ -956,7 +940,7 @@ class RecipeDatabase {
       'carbs': 60.0,
       'fat': 10.0,
       'difficulty': 'Easy',
-      'servingSize': 4
+      'servingSize': 1
     });
     await _insertIfMissing(db, {
       'name': 'Soft Boiled Egg',
@@ -965,13 +949,13 @@ class RecipeDatabase {
       'instructions': 'Boil eggs for 6.5 minutes in pot of boiling water with 1t Salt and 1t Vinegar. Immediately remove and place in ice water. ',
       'ingredients': 'egg',
       'dietRestriction': 'None',
-      'duration': 30,
-      'calories': 500.0,
-      'protein': 20.0,
-      'carbs': 60.0,
-      'fat': 10.0,
+      'duration': 7,
+      'calories': 71.0,
+      'protein': 1.0,
+      'carbs': 1.0,
+      'fat': 0.0,
       'difficulty': 'Easy',
-      'servingSize': 4
+      'servingSize': 1
     });
     await _insertIfMissing(db, {
       'name': 'Tuna',

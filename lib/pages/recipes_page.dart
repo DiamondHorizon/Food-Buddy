@@ -106,7 +106,8 @@ class _RecipesPageState extends State<RecipesPage> {
     }
     
     if (_activeFilters.maxDuration != null) {
-      if (r.duration < 0 || r.duration > _activeFilters.maxDuration!) return false;
+      final duration = r.duration;
+      if (duration == null || duration > _activeFilters.maxDuration!) return false;
     }
     
     if (_activeFilters.maxCalories != null) {
@@ -165,6 +166,7 @@ class _RecipesPageState extends State<RecipesPage> {
   }
 
   void _openDetails(RecipeMatch match) {
+    widget.state.recordOpen(match.recipe);
     showDialog<void>(
       context: context,
       builder: (_) => RecipeDetailDialog(
@@ -229,6 +231,7 @@ class _RecipesPageState extends State<RecipesPage> {
                       children: [
                         if (_query.isNotEmpty)
                           IconButton(
+                            tooltip: 'Clear search',
                             icon: const Icon(Icons.close),
                             onPressed: () {
                               _search.clear();
@@ -278,9 +281,9 @@ class _RecipesPageState extends State<RecipesPage> {
                     child: Text(
                       _query.trim().isNotEmpty
                           ? 'No recipes match "$_query".'
-                          : _filters.isEmpty
-                          ? 'No recipes yet. Add one to get started.'
-                          : 'No recipes match these filters.',
+                          : _activeFilters.hasActiveFilters
+                          ? 'No recipes match these filters.'
+                          : 'No recipes yet. Add one to get started.',
                       style: TextStyle(color: shades.muted),
                     ),
                   )
@@ -373,6 +376,7 @@ class _RecipeFilterDialogState extends State<_RecipeFilterDialog> {
               const SizedBox(height: 6),
               Wrap(
                 spacing: 6,
+                runSpacing: 6,
                 children: [
                   ChoiceChip(
                     label: const Text('Any'),
@@ -394,6 +398,7 @@ class _RecipeFilterDialogState extends State<_RecipeFilterDialog> {
               const SizedBox(height: 6),
               Wrap(
                 spacing: 6,
+                runSpacing: 6,
                 children: [
                   ChoiceChip(
                     label: const Text('Any'),
@@ -651,6 +656,9 @@ class RecipeCard extends StatelessWidget {
   }
 }
 
+String _formatNumber(double value) =>
+    value == value.roundToDouble() ? value.toStringAsFixed(0) : value.toStringAsFixed(1);
+
 class RecipeDetailDialog extends StatelessWidget {
   final RecipeMatch match;
   final VoidCallback onFavorite;
@@ -674,17 +682,17 @@ class RecipeDetailDialog extends StatelessWidget {
         .toList();
 
     final details = [
-      (Icons.schedule, '${r.duration} min'),
+      if (r.duration != null && r.duration! > 0) (Icons.schedule, '${r.duration} min'),
       if (r.servingSize != null)
         (Icons.people_outline, 'Serves ${r.servingSize}'),
       (Icons.signal_cellular_alt, r.difficulty.label),
     ];
 
     final nutritionDetails = [
-      if (r.calories > 0) (Icons.local_fire_department, '${r.calories} kcal'),
-      if (r.protein > 0) (Icons.fitness_center, '${r.protein} g protein'),
-      if (r.carbs > 0) (Icons.bakery_dining, '${r.carbs} g carbs'),
-      if (r.fat > 0) (Icons.egg, '${r.fat} g fat'),
+      if (r.calories > 0) (Icons.local_fire_department, '${_formatNumber(r.calories)} kcal'),
+      if (r.protein > 0) (Icons.fitness_center, '${_formatNumber(r.protein)} g protein'),
+      if (r.carbs > 0) (Icons.bakery_dining, '${_formatNumber(r.carbs)} g carbs'),
+      if (r.fat > 0) (Icons.egg, '${_formatNumber(r.fat)} g fat'),
     ];
 
     return AlertDialog(
@@ -754,9 +762,11 @@ class RecipeDetailDialog extends StatelessWidget {
                 children: [
                   Icon(Icons.no_food, size: 18, color: shades.muted),
                   const SizedBox(width: 6),
-                  Text(
-                    'Dietary restrictions: ${r.dietRestriction}',
-                    style: TextStyle(color: shades.muted),
+                  Expanded(
+                    child: Text(
+                      'Dietary restrictions: ${r.dietRestriction}',
+                      style: TextStyle(color: shades.muted),
+                    ),
                   ),
                 ],
               ),
@@ -947,9 +957,9 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
     });
     if (_nameError != null || _ingredientError != null) return;
 
-    final durationValue = double.tryParse(_duration.text.trim()) ?? 0.0;
+    final durationValue = int.tryParse(_duration.text.trim());
     final servingsValue = int.tryParse(_servings.text.trim());
-    final calorieValue = double.tryParse(_calories.text.trim()) ?? 0;
+    final double calorieValue = double.tryParse(_calories.text.trim()) ?? 0.0;
     final double proteinValue = double.tryParse(_protein.text.trim()) ?? 0.0;
     final double carbValue = double.tryParse(_carbs.text.trim()) ?? 0.0;
     final double fatValue = double.tryParse(_fat.text.trim()) ?? 0.0;
@@ -1070,12 +1080,10 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
               const SizedBox(height: 16),
               TextField(
                 controller: _duration,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ), // Better mobile keyboard for decimals
+                keyboardType: TextInputType.number,
                 inputFormatters: [
-                  // This regular expression strictly allows only numbers and a decimal point
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                  // This regular expression strictly allows only numbers
+                  FilteringTextInputFormatter.digitsOnly,
                 ],
                 decoration: const InputDecoration(
                   labelText: 'Prep Time (Minutes)',
@@ -1085,9 +1093,7 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
               const SizedBox(height: 16),
               TextField(
                 controller: _servings,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ), // Better mobile keyboard for decimals
+                keyboardType: TextInputType.number,
                 inputFormatters: [
                   // This regular expression strictly allows only numbers
                   FilteringTextInputFormatter.allow(RegExp(r'^\d*')),

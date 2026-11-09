@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'app_state.dart';
 import 'app_theme.dart';
+import 'burger_sidebar.dart';
 import 'pages/preferences.dart';
+import 'pages/home_page.dart';
 import 'pages/inventory_page.dart';
 import 'pages/recipes_page.dart';
 import 'platform.dart';
@@ -15,7 +16,6 @@ class AppTab {
   final Color accent;
   final List<Color> lightBg;
   final List<Color> darkBg;
-  final bool bottom;
   final String? imageAsset;
 
   const AppTab({
@@ -24,12 +24,18 @@ class AppTab {
     required this.accent,
     required this.lightBg,
     required this.darkBg,
-    this.bottom = false,
     this.imageAsset,
   });
 }
 
 const appTabs = [
+  AppTab(
+    label: 'Home',
+    icon: Icons.home_outlined,
+    accent: AppColors.homeAccent,
+    lightBg: AppColors.homeBg,
+    darkBg: AppColors.homeBgDark,
+  ),
   AppTab(
     label: 'Inventory',
     icon: Icons.kitchen_outlined,
@@ -45,14 +51,15 @@ const appTabs = [
     darkBg: AppColors.recipesBgDark,
   ),
   AppTab(
-    label: 'Preferences',
+    label: 'Account',
     icon: Icons.person_outline,
     accent: AppColors.accountAccent,
     lightBg: AppColors.accountBg,
     darkBg: AppColors.accountBgDark,
-    bottom: true,
   ),
 ];
+
+const _accountIndex = 3;
 
 class AppShell extends StatefulWidget {
   final AppState state;
@@ -64,11 +71,11 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _selected = 0;
-  bool _collapsed = false;
 
   Widget _pageFor(int index) => switch (index) {
-        0 => InventoryPage(state: widget.state),
-        1 => RecipesPage(state: widget.state),
+        0 => HomePage(state: widget.state),
+        1 => InventoryPage(state: widget.state),
+        2 => RecipesPage(state: widget.state),
         _ => const AccountPage(),
       };
 
@@ -87,18 +94,23 @@ class _AppShellState extends State<AppShell> {
               children: [
                 AppBanner(
                   color: tab.accent,
-                  onToggleSidebar: () => setState(() => _collapsed = !_collapsed),
+                  darkMode: dark,
+                  accountSelected: _selected == _accountIndex,
+                  onToggleDarkMode: widget.state.toggleDarkMode,
+                  onAccount: () => setState(() => _selected = _accountIndex),
                 ),
                 Expanded(
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Sidebar(
+                      BurgerSidebar(
                         accent: tab.accent,
-                        tabs: appTabs,
-                        selected: _selected,
-                        collapsed: _collapsed,
                         darkMode: dark,
-                        onToggleDarkMode: widget.state.toggleDarkMode,
+                        pages: [
+                          for (final t in appTabs.take(_accountIndex))
+                            BurgerPage(t.label, t.icon),
+                        ],
+                        selected: _selected,
                         onSelect: (i) => setState(() => _selected = i),
                       ),
                       Expanded(
@@ -128,52 +140,65 @@ class _AppShellState extends State<AppShell> {
 
 class AppBanner extends StatelessWidget {
   final Color color;
-  final VoidCallback onToggleSidebar;
-  const AppBanner({super.key, required this.color, required this.onToggleSidebar});
+  final bool darkMode;
+  final bool accountSelected;
+  final VoidCallback onToggleDarkMode;
+  final VoidCallback onAccount;
+
+  const AppBanner({
+    super.key,
+    required this.color,
+    required this.darkMode,
+    required this.accountSelected,
+    required this.onToggleDarkMode,
+    required this.onAccount,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final title = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: const [
-        Text(
-          'Food Buddy',
-          style: TextStyle(
-            color: AppColors.bannerText,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
+    const title = Text(
+      'Food Buddy',
+      style: TextStyle(
+        color: AppColors.bannerText,
+        fontFamily: 'CaveatBrush',
+        fontSize: 26,
+      ),
     );
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
-      height: 64,
+      height: 56,
       color: color,
-      padding: EdgeInsets.only(left: isMac ? 76 : 8),
+      padding: EdgeInsets.only(left: isMac ? 76 : 20),
       child: Row(
         children: [
-          IconButton(
-            tooltip: 'Toggle sidebar',
-            icon: SvgPicture.asset(
-              'assets/icons/menu.svg',
-              width: 45,
-              height: 45,
-            ),
-            onPressed: onToggleSidebar,
-            padding: const EdgeInsets.all(4)
-          ),
-          const SizedBox(width: 4),
           Expanded(
             child: isDesktop
                 ? DragToMoveArea(
-                    child: SizedBox.expand(
+                    child: const SizedBox.expand(
                       child: Align(alignment: Alignment.centerLeft, child: title),
                     ),
                   )
-                : Align(alignment: Alignment.centerLeft, child: title),
+                : const Align(alignment: Alignment.centerLeft, child: title),
           ),
+          IconButton(
+            tooltip: darkMode ? 'Switch to light mode' : 'Switch to dark mode',
+            onPressed: onToggleDarkMode,
+            color: AppColors.bannerText,
+            icon: Icon(darkMode ? Icons.dark_mode_outlined : Icons.light_mode_outlined),
+          ),
+          const SizedBox(width: 4),
+          IconButton(
+            tooltip: 'Account and preferences',
+            onPressed: onAccount,
+            color: AppColors.bannerText,
+            style: IconButton.styleFrom(
+              backgroundColor:
+                  accountSelected ? Colors.white.withValues(alpha: 0.2) : Colors.transparent,
+            ),
+            icon: Icon(accountSelected ? Icons.person : Icons.person_outline),
+          ),
+          SizedBox(width: showCustomWindowButtons ? 12 : 16),
           if (showCustomWindowButtons) const WindowButtons(),
         ],
       ),
@@ -253,162 +278,6 @@ class _WindowButtonState extends State<_WindowButton> {
             height: 56,
             color: _hover ? hoverBg : Colors.transparent,
             child: Icon(widget.icon, size: 18, color: AppColors.bannerText),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class Sidebar extends StatelessWidget {
-  final Color accent;
-  final List<AppTab> tabs;
-  final int selected;
-  final bool collapsed;
-  final bool darkMode;
-  final VoidCallback onToggleDarkMode;
-  final ValueChanged<int> onSelect;
-
-  const Sidebar({
-    super.key,
-    required this.accent,
-    required this.tabs,
-    required this.selected,
-    required this.collapsed,
-    required this.darkMode,
-    required this.onToggleDarkMode,
-    required this.onSelect,
-  });
-
-  Widget _item(int i) => Padding(
-        padding: const EdgeInsets.only(bottom: 4),
-        child: _maybeTooltip(
-          tabs[i].label,
-          _SidebarItem(
-            tab: tabs[i],
-            selected: i == selected,
-            onTap: () => onSelect(i),
-          ),
-        ),
-      );
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeOut,
-      width: collapsed ? 68 : 216,
-      color: AppColors.sidebarFor(accent, darkMode),
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (var i = 0; i < tabs.length; i++)
-            if (!tabs[i].bottom) _item(i),
-          const Spacer(),
-          for (var i = 0; i < tabs.length; i++)
-            if (tabs[i].bottom) _item(i),
-          _maybeTooltip(
-            darkMode ? 'Switch to light mode' : 'Switch to dark mode',
-            _ThemeToggle(darkMode: darkMode, onToggle: onToggleDarkMode),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _maybeTooltip(String label, Widget child) =>
-      collapsed ? Tooltip(message: label, child: child) : child;
-}
-
-class _SidebarItem extends StatelessWidget {
-  final AppTab tab;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _SidebarItem({required this.tab, required this.selected, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final fg = selected ? Colors.white : AppShades.of(context).ink;
-
-    return Material(
-      color: selected ? tab.accent : Colors.transparent,
-      borderRadius: BorderRadius.circular(10),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        onTap: onTap,
-        child: SizedBox(
-          height: 44,
-          child: LayoutBuilder(
-            builder: (context, c) => Row(
-              children: [
-                SizedBox(width: 38, child: Icon(tab.icon, color: fg, size: 22)),
-                if (c.maxWidth > 120)
-                  Expanded(
-                    child: Text(
-                      tab.label,
-                      maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.fade,
-                      style: TextStyle(
-                        color: fg,
-                        fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ThemeToggle extends StatelessWidget {
-  final bool darkMode;
-  final VoidCallback onToggle;
-
-  const _ThemeToggle({required this.darkMode, required this.onToggle});
-
-  @override
-  Widget build(BuildContext context) {
-    final fg = AppShades.of(context).ink;
-
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(10),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        onTap: onToggle,
-        child: SizedBox(
-          height: 44,
-          child: LayoutBuilder(
-            builder: (context, c) => Row(
-              children: [
-                SizedBox(
-                  width: 38,
-                  child: Icon(
-                    darkMode ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
-                    color: fg,
-                    size: 22,
-                  ),
-                ),
-                if (c.maxWidth > 150) ...[
-                  Expanded(
-                    child: Text(
-                      'Dark mode',
-                      maxLines: 1,
-                      softWrap: false,
-                      overflow: TextOverflow.fade,
-                      style: TextStyle(color: fg, fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                  Switch(value: darkMode, onChanged: (_) => onToggle()),
-                ],
-              ],
-            ),
           ),
         ),
       ),

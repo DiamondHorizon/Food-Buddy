@@ -20,7 +20,7 @@ class RecipeDatabase {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _createDB, // This triggers only on first app launch
       onUpgrade: _upgradeDB,
     );
@@ -50,7 +50,10 @@ class RecipeDatabase {
         carbs REAL,
         fat REAL,
         difficulty TEXT,
-        servingSize INTEGER
+        servingSize INTEGER,
+        favorite INTEGER NOT NULL DEFAULT 0,
+        hidden INTEGER NOT NULL DEFAULT 0,
+        clicks INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
@@ -997,6 +1000,18 @@ class RecipeDatabase {
     if (oldVersion < 3) {
       await _insertStarterRecipes(db);
     }
+    if (oldVersion < 4) {
+      await _addColumnIfMissing(db, 'favorite', 'INTEGER NOT NULL DEFAULT 0');
+      await _addColumnIfMissing(db, 'hidden', 'INTEGER NOT NULL DEFAULT 0');
+      await _addColumnIfMissing(db, 'clicks', 'INTEGER NOT NULL DEFAULT 0');
+      await _insertStarterRecipes(db);
+    }
+  }
+
+  Future _addColumnIfMissing(Database db, String column, String definition) async {
+    final columns = await db.rawQuery('PRAGMA table_info(Recipes)');
+    if (columns.any((c) => c['name'] == column)) return;
+    await db.execute('ALTER TABLE Recipes ADD COLUMN $column $definition');
   }
 
   // Insert a recipe only if its name isn't already in the database
@@ -1016,7 +1031,7 @@ class RecipeDatabase {
   // duration -> integer comment for devs: threw errors becuase it was cast in a table as int but user side as double, so it crashes
   // Insert a new item into the database
   Future<int> insertItem(String name, String type, String meal, String instructions,
-      {String ingredients = '', String dietRestriction = '', double duration = 0.0, 
+      {String ingredients = '', String dietRestriction = '', int? duration,
       double calories = 0.0, double protein = 0.0, double carbs = 0.0, 
       double fat = 0.0, String difficulty = '', int? servingSize = 1}) async {
     final db = await instance.database;
@@ -1058,5 +1073,9 @@ class RecipeDatabase {
       where: 'id = ?',
       whereArgs: [id],
     );
+  }
+    Future<int> incrementClicks(int id) async {
+    final db = await instance.database;
+    return await db.rawUpdate('UPDATE Recipes SET clicks = clicks + 1 WHERE id = ?', [id]);
   }
 }

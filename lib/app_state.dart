@@ -47,7 +47,7 @@ StorageArea storageAreaFrom(Object? value) => StorageArea.values.firstWhere(
       orElse: () => StorageArea.pantry,
     );
 
-enum MealType { breakfast, lunch, dinner, snack, drink }
+enum MealType { breakfast, lunch, dinner, snack, dessert, drink }
 
 extension MealTypeLabel on MealType {
   String get label => name[0].toUpperCase() + name.substring(1);
@@ -57,6 +57,14 @@ MealType mealTypeFrom(Object? value) => MealType.values.firstWhere(
       (m) => m.name == value.toString().trim().toLowerCase(),
       orElse: () => MealType.dinner,
     );
+
+MealType mealForHour(int hour) => switch (hour) {
+      >= 5 && < 11 => MealType.breakfast,
+      >= 11 && < 15 => MealType.lunch,
+      >= 15 && < 17 => MealType.snack,
+      >= 17 && < 21 => MealType.dinner,
+      _ => MealType.dessert,
+    };
 
 enum Difficulty { easy, intermediate, advanced, difficult, experienced }
 
@@ -94,7 +102,7 @@ class Recipe {
   final MealType meal;
   final String instructions;
   final String dietRestriction;
-  final double duration;
+  final int? duration;
   final double calories;
   final double protein;
   final double carbs;
@@ -104,6 +112,7 @@ class Recipe {
   final List<String> ingredients;
   final bool favorite;
   final bool hidden;
+  final int clicks;
 
   const Recipe({
     this.id,
@@ -112,7 +121,7 @@ class Recipe {
     required this.meal,
     this.instructions = '',
     this.dietRestriction = '',
-    this.duration = 0.0,
+    this.duration,
     this.calories = 0.0,
     this.protein = 0.0,
     this.carbs = 0.0,
@@ -122,6 +131,7 @@ class Recipe {
     required this.ingredients,
     this.favorite = false,
     this.hidden = false,
+    this.clicks = 0,
   });
 
   factory Recipe.fromMap(Map<String, dynamic> row) => Recipe(
@@ -131,7 +141,7 @@ class Recipe {
         meal: mealTypeFrom(row['meal']),
         instructions: (row['instructions'] as String?) ?? '',
         dietRestriction: (row['dietRestriction'] as String?) ?? '',
-        duration: (row['duration'] as num?)?.toDouble() ?? 0.0,
+        duration: (row['duration'] as num?)?.toInt(),
         calories: (row['calories'] as num?)?.toDouble() ?? 0.0,
         protein: (row['protein'] as num?)?.toDouble() ?? 0.0,
         carbs: (row['carbs'] as num?)?.toDouble() ?? 0.0,
@@ -145,6 +155,7 @@ class Recipe {
             .toList(),
         favorite: row['favorite'] == 1,
         hidden: row['hidden'] == 1,
+        clicks: (row['clicks'] as num?)?.toInt() ?? 0,
       );
 }
 
@@ -188,11 +199,12 @@ class AppState extends ChangeNotifier {
     ingredients.remove(item);
     notifyListeners();
   }
-  // difficulty enum is stricter so I kept that
+
   Future<void> addRecipe(Recipe r) async {
     await RecipeDatabase.instance.insertItem(
       r.name, r.type, r.meal.label, r.instructions,
       ingredients: r.ingredients.join(', '),
+      servingSize: r.servingSize ?? 1,
       dietRestriction: r.dietRestriction,
       duration: r.duration,
       calories: r.calories,
@@ -200,7 +212,6 @@ class AppState extends ChangeNotifier {
       carbs: r.carbs,
       fat: r.fat,
       difficulty: r.difficulty.label,
-      servingSize: r.servingSize,
     );
     await load();
   }
@@ -214,6 +225,12 @@ class AppState extends ChangeNotifier {
   Future<void> toggleHidden(Recipe r) async {
     if (r.id == null) return;
     await RecipeDatabase.instance.setHidden(r.id!, !r.hidden);
+    await load();
+  }
+
+  Future<void> recordOpen(Recipe r) async {
+    if (r.id == null) return;
+    await RecipeDatabase.instance.incrementClicks(r.id!);
     await load();
   }
 
@@ -232,7 +249,8 @@ class AppState extends ChangeNotifier {
       final have = <String>[];
       final missing = <String>[];
       for (final ing in r.ingredients) {
-        (owned.contains(ing) ? have : missing).add(ing);
+        final onHand = owned.any((item) => item.isNotEmpty && ing.contains(item));
+        (onHand ? have : missing).add(ing);
       }
       results.add(RecipeMatch(r, have, missing));
     }
@@ -243,5 +261,21 @@ class AppState extends ChangeNotifier {
       return a.missing.length.compareTo(b.missing.length);
     });
     return results;
+  }
+
+  List<RecipeMatch> recommendations({DateTime? now, int limit = 6}) {
+    final slot = mealForHour((now ?? DateTime.now()).hour);
+    final scored = matches().where((m) => !m.recipe.hidden).map((m) {
+      final r = m.recipe;
+      final total = r.ingredients.length;
+      final fitsNow = r.meal == slot || r.type.toLowerCase() == slot.name;
+      final score = (fitsNow ? 3.0 : 0.0) +
+          r.clicks.clamp(0, 10).toDouble() * 0.3 +
+          (total == 0 ? 0.0 : m.have.length / total * 2) +
+          (r.favorite ? 1.0 : 0.0);
+      return (m, score);
+    }).toList()
+      ..sort((a, b) => b.$2.compareTo(a.$2));
+    return scored.take(limit).map((e) => e.$1).toList();
   }
 }

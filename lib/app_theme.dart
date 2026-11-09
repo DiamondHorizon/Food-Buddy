@@ -18,16 +18,26 @@ class AppColors {
   static const bannerText = Colors.white;
   static const closeHover = Color(0xFFE81123);
 
-  static const inventoryAccent = Palette.green;
+  static const inventoryAccent = Color.fromARGB(255, 43, 98, 0);
   static const recipesAccent = Palette.redOchre;
   static const accountAccent = Palette.navy;
+  static const homeAccent = Color(0xFFB84A00);
 
-  static const inventoryBg = [Color.fromARGB(255, 196, 221, 190), Color.fromARGB(255, 201, 225, 170)];
+  static const inventoryBg = [Color.fromARGB(255, 230, 247, 226), Color.fromARGB(255, 201, 225, 170)];
   static const inventoryBgDark = [Color.fromARGB(255, 8, 21, 0), Color.fromARGB(255, 0, 0, 0)];
-  static const recipesBg = [Color.fromARGB(255, 255, 214, 214), Color(0xFFFFD6BA)];
+  static const recipesBg = [Color.fromARGB(255, 255, 236, 236), Color(0xFFFFD6BA)];
   static const recipesBgDark = [Color.fromARGB(255, 56, 13, 1), Color.fromARGB(255, 0, 0, 0)];
-  static const accountBg = [Color(0xFFEEF2F9), Color(0xFFD9E1EE)];
+  static const accountBg = [Color.fromARGB(255, 239, 245, 255), Color(0xFFD9E1EE)];
   static const accountBgDark = [Color(0xFF111A2B), Color.fromARGB(255, 7, 13, 23)];
+  static const homeBg = [Color(0xFFFFF6DB), Color(0xFFFFE2B8)];
+  static const homeBgDark = [Color(0xFF2A1D0B), Color(0xFF1F1508)];
+
+  static const bun = Color(0xFFECB862);
+  static const lettuce = Color(0xFF6DB33F);
+  static const cheese = Color(0xFFFFC800);
+  static const patty = Color(0xFF6B3A1E);
+  static const onion = Color(0xFFE9D8F2);
+  static const tomato = Color(0xFFC62D1A);
 
   static const pantryLight = Color(0xFFF4E4D9);
   static const pantry = Color(0xFFA0522D);

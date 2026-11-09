@@ -994,7 +994,7 @@ class RecipeDatabase {
       'type': 'Entree',
       'meal': 'Dinner',
       'instructions': 'Brown ~3lbs of oxtail (no oil necessary) in a large pot on medium-high (over 1 gal preferred), about 10 min. Fill pot to just above the meat with water. Add all the spices and roughly diced onion (whole spices preferred, not ground), adding Thai Chili, garlic, and/or Black Peppercorns if preferred. Boil for 3 hours minimum. One hour prior to eating, add all preferred vegetables, chopped roughly to bite size proportions. Salt to preference when done, serve over rice/millet or plain.',
-      'ingredients': 'Oxtail, Cinnamon, Star Anise, Clove, Nutmeg, Onion, Carrot, Celery, Potato, Radish',
+      'ingredients': 'Oxtail, Cinnamon, Star Anise, Clove, Nutmeg, Onion, Carrot, Celery, Potato, Radish', // FIX RECIPE AMOUNTS
       'dietRestriction': 'None',
       'duration': 200,
       'calories': 350.0,

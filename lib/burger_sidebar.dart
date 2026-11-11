@@ -63,7 +63,7 @@ const _layers = [
     page: 1,
   ),
   _Layer(
-    color: AppColors.onion,
+    color: Color.fromARGB(255, 212, 133, 255),
     closedHeight: 3,
     openHeight: 8,
     radius: BorderRadius.all(Radius.circular(6)),

@@ -9,6 +9,16 @@ import 'platform.dart';
 import 'app_shell.dart';
 import 'app_theme.dart';
 
+extension StringCasingExtension on String {
+  String toTitleCase() {
+    if (trim().isEmpty) return this;
+    return split(' ')
+        .map((word) => word.isEmpty 
+            ? '' 
+            : '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}')
+        .join(' ');
+  }
+}
 Future<void> main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:food_buddy/main.dart';
 
 import '../app_state.dart';
 import '../app_theme.dart';
@@ -78,6 +79,30 @@ class InventoryPage extends StatelessWidget {
   }
 }
 
+Color? getExpirationColor(String expirationStr) {
+  if (expirationStr.isEmpty) return null;
+  
+  final expDate = DateTime.tryParse(expirationStr);
+  if (expDate == null) return null;
+
+  // Normalize both dates to midnight so time of day doesn't skew the day count
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  final target = DateTime(expDate.year, expDate.month, expDate.day);
+
+  final diffDays = target.difference(today).inDays;
+
+  if (diffDays < 0) {
+    return Colors.red;    // Expired
+  } else if (diffDays <= 7) {
+    return Colors.orange; // Expiring this week (0-7 days)
+  } else if (diffDays <= 14) {
+    return Colors.amber;  // Expiring next week (8-14 days)
+  }
+  
+  return null;
+}
+
 class StorageSection extends StatelessWidget {
   final StorageArea area;
   final List<Ingredient> items;
@@ -109,30 +134,71 @@ class StorageSection extends StatelessWidget {
         : Column(
             children: [
               for (final item in items)
-                ExpansionTile(
-                  dense: true,
-                  title: Text(item.name,
-                      style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15)),
-                  subtitle: item.quantity.isEmpty ? null : Text(item.quantity),
-                  trailing: IconButton(
-                    tooltip: 'Remove',
-                    icon: const Icon(Icons.close, size: 18),
-                    onPressed: () => onRemove(item),
-                  ),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                Builder(
+                  builder: (context) {
+                    final expColor = getExpirationColor(item.expiration);
+                    
+                    return ExpansionTile(
+                      dense: true,
+                      // Optional: Add a colored indicator dot next to the item name if expiring/expired
+                      title: Row(
                         children: [
-                          Text('Expiration: ${item.expiration}'),
-                          const SizedBox(height: 8),
-                          const Text('Edit quantity function goes here'),
+                          if (expColor != null) ...[
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: expColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+                          Expanded(
+                            child: Text(
+                              item.name.toTitleCase(),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
                         ],
-                      )
-                    )
-                  ],
-                ),
+                      ),
+                      subtitle: item.quantity.isEmpty ? null : Text(item.quantity),
+                      trailing: IconButton(
+                        tooltip: 'Remove',
+                        icon: const Icon(Icons.close, size: 18),
+                        onPressed: () => onRemove(item),
+                      ),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              // Color-code the expiration text when expanded too!
+                              Row(
+                                children: [
+                                  const Text('Expiration: '),
+                                  Text(
+                                    item.expiration.isEmpty ? 'None' : item.expiration,
+                                    style: TextStyle(
+                                      color: expColor,
+                                      fontWeight: expColor != null ? FontWeight.bold : FontWeight.normal,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              const Text('Edit quantity function goes here'),
+                            ],
+                          )
+                        )
+                      ],
+                    );
+                  }
+                )
             ],
           );
 
@@ -201,6 +267,23 @@ class _AddIngredientDialogState extends State<AddIngredientDialog> {
   late StorageArea _area = widget.initialArea;
   String? _error;
 
+  // Function to open the native calendar popup
+  Future<void> _pickExpirationDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(), // Can't pick past dates if it's a new item
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null) {
+      setState(() {
+        // Format to YYYY-MM-DD string for the database
+        _exp.text = picked.toIso8601String().split('T')[0];
+      });
+    }
+  }
+
   void _submit() {
     final name = _name.text.trim().toLowerCase();
     if (name.isEmpty) {
@@ -244,13 +327,26 @@ class _AddIngredientDialogState extends State<AddIngredientDialog> {
               onSubmitted: (_) => _submit(),
             ),
             const SizedBox(height: 12),
+            // Expiration Date Field
             TextField(
               controller: _exp,
-              decoration: const InputDecoration(
-                labelText: 'Expiration Date (optional)',
-                hintText: 'e.g. Nov 9, 2026',
+              readOnly: true, // Prevents manual keyboard typing mistakes!
+              onTap: _pickExpirationDate, // Opens calendar when clicked
+              decoration: InputDecoration(
+                labelText: 'Expiration Date (Optional)',
+                hintText: 'Select date',
+                prefixIcon: const Icon(Icons.calendar_today),
+                suffixIcon: _exp.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          setState(() {
+                            _exp.clear();
+                          });
+                        },
+                      )
+                    : null,
               ),
-              onSubmitted: (_) => _submit(),
             ),
             const SizedBox(height: 16),
             Text('Stored in', style: TextStyle(color: AppShades.of(context).muted)),

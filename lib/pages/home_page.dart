@@ -22,6 +22,7 @@ class HomePage extends StatelessWidget {
       context: context,
       builder: (_) => RecipeDetailDialog(
         match: m,
+        state: state,
         onFavorite: () => state.toggleFavorite(m.recipe),
         onHide: () => state.toggleHidden(m.recipe),
       ),

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'ingredient_database.dart';
@@ -95,6 +97,19 @@ class Ingredient {
       );
 }
 
+class RecipeIngredient {
+  final String name;
+  final String quantity; // e.g. "2 cups", "100g", "3"
+
+  RecipeIngredient({required this.name, required this.quantity});
+
+  // Serialization helpers if storing in SQLite as JSON text or comma-separated strings
+  Map<String, dynamic> toJson() => {'name': name, 'quantity': quantity};
+  
+  factory RecipeIngredient.fromJson(Map<String, dynamic> json) => 
+      RecipeIngredient(name: json['name'], quantity: json['quantity'] ?? '');
+}
+
 class Recipe {
   final int? id;
   final String name;
@@ -109,7 +124,7 @@ class Recipe {
   final double fat;
   final Difficulty difficulty;
   final int? servingSize;
-  final List<String> ingredients;
+  final List<RecipeIngredient> ingredients;
   final bool favorite;
   final bool hidden;
   final int clicks;
@@ -148,11 +163,11 @@ class Recipe {
         fat: (row['fat'] as num?)?.toDouble() ?? 0.0,
         difficulty: difficultyFrom(row['difficulty']),
         servingSize: (row['servingSize'] as num?)?.toInt(),
-        ingredients: ((row['ingredients'] as String?) ?? '')
-            .split(',')
-            .map((s) => s.trim().toLowerCase())
-            .where((s) => s.isNotEmpty)
-            .toList(),
+        ingredients: row['ingredients'] != null && (row['ingredients'] as String).isNotEmpty
+          ? (jsonDecode(row['ingredients'] as String) as List)
+              .map((e) => RecipeIngredient.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : [],
         favorite: row['favorite'] == 1,
         hidden: row['hidden'] == 1,
         clicks: (row['clicks'] as num?)?.toInt() ?? 0,
@@ -203,7 +218,7 @@ class AppState extends ChangeNotifier {
   Future<void> addRecipe(Recipe r) async {
     await RecipeDatabase.instance.insertItem(
       r.name, r.type, r.meal.label, r.instructions,
-      ingredients: r.ingredients.join(', '),
+      ingredients: jsonEncode(r.ingredients.map((i) => i.toJson()).toList()),
       servingSize: r.servingSize ?? 1,
       dietRestriction: r.dietRestriction,
       duration: r.duration,
@@ -249,8 +264,8 @@ class AppState extends ChangeNotifier {
       final have = <String>[];
       final missing = <String>[];
       for (final ing in r.ingredients) {
-        final onHand = owned.any((item) => item.isNotEmpty && ing.contains(item));
-        (onHand ? have : missing).add(ing);
+        final onHand = owned.any((item) => item.isNotEmpty && ing.name.toLowerCase().contains(item));
+        (onHand ? have : missing).add(ing.name);
       }
       results.add(RecipeMatch(r, have, missing));
     }
@@ -277,5 +292,45 @@ class AppState extends ChangeNotifier {
     }).toList()
       ..sort((a, b) => b.$2.compareTo(a.$2));
     return scored.take(limit).map((e) => e.$1).toList();
+  }
+
+  Future<void> markRecipeAsMade(Recipe recipe) async {
+    // Fetch current inventory items from the database
+    final inventoryRows = await IngredientDatabase.instance.getIngredients();
+
+    for (final recipeIng in recipe.ingredients) {
+      // Find matching item in inventory by name (case-insensitive)
+      final match = inventoryRows.firstWhere(
+        (item) => item['name'].toString().toLowerCase() == recipeIng.name.toLowerCase(),
+        orElse: () => {},
+      );
+
+      if (match.isNotEmpty) {
+        final int itemId = match['id'];
+        final String currentQtyStr = match['quantity'] ?? '';
+        
+        // Extract numbers from strings (e.g., "500 g" -> 500.0, "2 cups" -> 2.0)
+        final double? invNum = double.tryParse(RegExp(r'\d+\.?\d*').stringMatch(currentQtyStr) ?? '');
+        final double? recipeNum = double.tryParse(RegExp(r'\d+\.?\d*').stringMatch(recipeIng.quantity) ?? '');
+
+        if (invNum != null && recipeNum != null) {
+          final double newQty = invNum - recipeNum;
+          if (newQty <= 0) {
+            // If inventory hits 0 or below, remove the item completely
+            await IngredientDatabase.instance.deleteItem(itemId);
+          } else {
+            // Otherwise, preserve the unit suffix (e.g. "cups" or "g") if it existed
+            final String unitSuffix = currentQtyStr.replaceAll(RegExp(r'[\d.]+'), '').trim();
+            final updatedQtyText = unitSuffix.isNotEmpty ? '$newQty $unitSuffix' : '$newQty';
+            
+            // Update the quantity in the database
+            await IngredientDatabase.instance.updateItemQuantity(itemId, updatedQtyText);
+          }
+        }
+      }
+    }
+    
+    // Refresh your local inventory list so the UI reflects the subtraction
+    await load();
   }
 }

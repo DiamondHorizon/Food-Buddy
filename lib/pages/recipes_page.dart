@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:food_buddy/main.dart';
 
 import '../app_state.dart';
 import '../app_theme.dart';
@@ -139,10 +140,10 @@ class _RecipesPageState extends State<RecipesPage> {
       textMatch = switch (_searchBy) {
         _SearchBy.name => r.name.toLowerCase().contains(q),
         _SearchBy.ingredient => q
-            .split(',')
-            .map((s) => s.trim())
-            .where((s) => s.isNotEmpty)
-            .every((wanted) => r.ingredients.any((i) => i.contains(wanted))),
+          .split(',')
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .every((wanted) => r.ingredients.any((i) => i.name.toLowerCase().contains(wanted))),
       };
     }
     
@@ -171,6 +172,7 @@ class _RecipesPageState extends State<RecipesPage> {
       context: context,
       builder: (_) => RecipeDetailDialog(
         match: match,
+        state: widget.state,
         onFavorite: () => widget.state.toggleFavorite(match.recipe),
         onHide: () => widget.state.toggleHidden(match.recipe),
       ),
@@ -661,12 +663,14 @@ String _formatNumber(double value) =>
 
 class RecipeDetailDialog extends StatelessWidget {
   final RecipeMatch match;
+  final AppState state;
   final VoidCallback onFavorite;
   final VoidCallback onHide;
 
   const RecipeDetailDialog({
     super.key,
     required this.match,
+    required this.state,
     required this.onFavorite,
     required this.onHide,
   });
@@ -788,16 +792,22 @@ class RecipeDetailDialog extends StatelessWidget {
                 child: Row(
                   children: [
                     Icon(
-                      match.have.contains(ing)
+                      match.have.contains(ing.name)
                           ? Icons.check_circle
                           : Icons.radio_button_unchecked,
                       size: 20,
-                      color: match.have.contains(ing)
+                      color: match.have.contains(ing.name)
                           ? shades.matchComplete
                           : shades.muted,
                     ),
                     const SizedBox(width: 10),
-                    Expanded(child: Text(ing)),
+                    Expanded(
+                      child: Text(
+                        ing.quantity.isNotEmpty
+                            ? '${ing.quantity} ${ing.name}'
+                            : ing.name,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -844,6 +854,20 @@ class RecipeDetailDialog extends StatelessWidget {
         ),
       ),
       actions: [
+        FilledButton.icon(
+          onPressed: () async {
+            // Await the inventory deduction
+            await state.markRecipeAsMade(match.recipe);
+            
+            if (!context.mounted) return;
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Cooked ${match.recipe.name}! Inventory updated.')),
+            );
+          },
+          icon: const Icon(Icons.restaurant),
+          label: const Text('Made Recipe'),
+        ),
         TextButton.icon(
           onPressed: () {
             Navigator.pop(context);
@@ -917,11 +941,12 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
   final _instructions = TextEditingController();
   final TextEditingController _duration = TextEditingController();
   final TextEditingController _servings = TextEditingController();
-  final _ingredientInput = TextEditingController();
-  final List<String> _ingredients = [];
   MealType _meal = MealType.dinner;
   Difficulty _difficulty = Difficulty.easy;
   String? _nameError;
+  final TextEditingController _ingNameController = TextEditingController();
+  final TextEditingController _ingQtyController = TextEditingController();
+  final List<RecipeIngredient> _ingredients = [];
   String? _ingredientError;
 
   bool _showAdvanced = false; // Tracks if advanced fields are visible
@@ -931,23 +956,23 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
   final TextEditingController _carbs = TextEditingController();
   final TextEditingController _fat = TextEditingController();
 
-  void _addIngredients() {
-    final parts = _ingredientInput.text
-        .split(',')
-        .map((s) => s.trim().toLowerCase())
-        .where((s) => s.isNotEmpty)
-        .toList();
+  void _addIngredient() {
+    final name = _ingNameController.text.trim().toTitleCase();
+    final qty = _ingQtyController.text.trim();
+
+    if (name.isEmpty) return;
+
     setState(() {
-      for (final p in parts) {
-        if (!_ingredients.contains(p)) _ingredients.add(p);
-      }
-      if (_ingredients.isNotEmpty) _ingredientError = null;
+      _ingredients.add(RecipeIngredient(name: name, quantity: qty));
+      _ingredientError = null;
     });
-    _ingredientInput.clear();
+
+    _ingNameController.clear();
+    _ingQtyController.clear();
   }
 
   void _submit() {
-    _addIngredients();
+    _addIngredient();
     final name = _name.text.trim();
     setState(() {
       _nameError = name.isEmpty ? 'Enter a recipe name.' : null;
@@ -996,7 +1021,8 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
     _protein.dispose();
     _carbs.dispose();
     _fat.dispose();
-    _ingredientInput.dispose();
+    _ingNameController.dispose();
+    _ingQtyController.dispose();
     super.dispose();
   }
 
@@ -1043,37 +1069,53 @@ class _AddRecipeDialogState extends State<AddRecipeDialog> {
                 ],
               ),
               const SizedBox(height: 16),
+              // --- INGREDIENT INPUT SECTION ---
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
+                    flex: 2,
                     child: TextField(
-                      controller: _ingredientInput,
-                      decoration: InputDecoration(
-                        labelText: 'Ingredients',
-                        hintText: 'e.g. egg, milk, flour',
-                        errorText: _ingredientError,
+                      controller: _ingNameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Ingredient Name',
+                        hintText: 'e.g. Flour',
                       ),
-                      onSubmitted: (_) => _addIngredients(),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 1,
+                    child: TextField(
+                      controller: _ingQtyController,
+                      decoration: const InputDecoration(
+                        labelText: 'Quantity',
+                        hintText: 'e.g. 2 cups',
+                      ),
+                      onSubmitted: (_) => _addIngredient(),
                     ),
                   ),
                   const SizedBox(width: 8),
                   IconButton.filledTonal(
-                    tooltip: 'Add ingredients',
-                    onPressed: _addIngredients,
+                    tooltip: 'Add ingredient',
+                    onPressed: _addIngredient,
                     icon: const Icon(Icons.add),
                   ),
                 ],
               ),
+              if (_ingredientError != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(_ingredientError!, style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 12)),
+                ),
               const SizedBox(height: 12),
               Wrap(
                 spacing: 6,
                 runSpacing: 6,
                 children: [
-                  for (final i in _ingredients)
+                  for (final ing in _ingredients)
                     InputChip(
-                      label: Text(i),
-                      onDeleted: () => setState(() => _ingredients.remove(i)),
+                      label: Text('${ing.quantity.isNotEmpty ? "${ing.quantity} " : ""}${ing.name}'),
+                      onDeleted: () => setState(() => _ingredients.remove(ing)),
                     ),
                 ],
               ),

@@ -65,6 +65,11 @@ class IngredientDatabase {
     );
   }
 
+  Future<int> updateItemQuantity(int id, String newQuantity) async {
+    final db = await instance.database;
+    return await db.update('Ingredients', {'quantity': newQuantity}, where: 'id = ?', whereArgs: [id]);
+  }
+
   Future<int> deleteItem(int id) async {
     final db = await instance.database;
     return await db.delete('Ingredients', where: 'id = ?', whereArgs: [id]);

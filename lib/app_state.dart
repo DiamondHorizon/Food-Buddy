@@ -253,7 +253,6 @@ class AppState extends ChangeNotifier {
       ingredients.where((i) => i.area == area).toList();
 
   List<RecipeMatch> matches({Set<MealType> meals = const {}}) {
-    final owned = ingredients.map((i) => i.name).toSet();
     final results = <RecipeMatch>[];
 
     for (final r in recipes) {
@@ -261,11 +260,50 @@ class AppState extends ChangeNotifier {
           !meals.any((m) => m == r.meal || m.name == r.type.toLowerCase())) {
         continue;
       }
+
       final have = <String>[];
       final missing = <String>[];
+
       for (final ing in r.ingredients) {
-        final onHand = owned.any((item) => item.isNotEmpty && ing.name.toLowerCase().contains(item));
-        (onHand ? have : missing).add(ing.name);
+        final reqName = ing.name.trim().toLowerCase();
+
+        // Find all matching items in inventory (in case an ingredient is split across fridge/pantry/freezer)
+        final matchingItems = ingredients.where(
+          (item) => item.name.isNotEmpty && reqName.contains(item.name),
+        );
+
+        bool hasEnough = false;
+
+        if (matchingItems.isNotEmpty) {
+          final double? requiredQty = double.tryParse(
+            RegExp(r'\d+\.?\d*').stringMatch(ing.quantity) ?? '',
+          );
+
+          if (requiredQty == null || requiredQty <= 0) {
+            // Recipe specifies no numeric amount (e.g., "salt" or "") -> owning it is enough
+            hasEnough = true;
+          } else {
+            // Sum available quantities across matching inventory entries
+            double ownedQty = 0.0;
+            bool hasUnquantifiedStock = false;
+
+            for (final item in matchingItems) {
+              final double? parsed = double.tryParse(
+                RegExp(r'\d+\.?\d*').stringMatch(item.quantity) ?? '',
+              );
+              if (parsed != null) {
+                ownedQty += parsed;
+              } else {
+                // Inventory item exists without a numeric quantity
+                hasUnquantifiedStock = true;
+              }
+            }
+
+            hasEnough = ownedQty >= requiredQty || hasUnquantifiedStock;
+          }
+        }
+
+        (hasEnough ? have : missing).add(ing.name);
       }
       results.add(RecipeMatch(r, have, missing));
     }

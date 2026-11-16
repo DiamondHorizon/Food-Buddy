@@ -206,26 +206,30 @@ class AppBanner extends StatelessWidget {
   }
 }
 
+
+
 class WindowButtons extends StatelessWidget {
   const WindowButtons({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final window = WindowManager.instance.getCurrent()!;
+
     return Row(
       children: [
         _WindowButton(
           icon: Icons.remove,
           tooltip: 'Minimize',
-          onTap: () => windowManager.minimize(),
+          onTap: () => window.minimize(),
         ),
         _WindowButton(
           icon: Icons.crop_square,
           tooltip: 'Maximize',
-          onTap: () async {
-            if (await windowManager.isMaximized()) {
-              await windowManager.unmaximize();
+          onTap: () {
+            if (window.isMaximized) {
+              window.unmaximize();
             } else {
-              await windowManager.maximize();
+              window.maximize();
             }
           },
         ),
@@ -233,12 +237,14 @@ class WindowButtons extends StatelessWidget {
           icon: Icons.close,
           tooltip: 'Close',
           hoverColor: AppColors.closeHover,
-          onTap: () => windowManager.close(),
+          onTap: () => window.close(),
         ),
       ],
     );
   }
 }
+
+
 
 class _WindowButton extends StatefulWidget {
   final IconData icon;

@@ -32,17 +32,14 @@ Future<void> main() async {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
 
-    await windowManager.ensureInitialized();
-    const options = WindowOptions(
-      size: Size(1200, 780),
-      minimumSize: Size(820, 560),
-      center: true,
-      titleBarStyle: TitleBarStyle.hidden,
-    );
-    windowManager.waitUntilReadyToShow(options, () async {
-      await windowManager.show();
-      await windowManager.focus();
-    });
+    final window = WindowManager.instance.getCurrent()!;
+
+    window.setSize(const Size(1200, 780).toNative(), false);
+    window.minimumSize = const Size(820, 560).toNative();
+    window.titleBarStyle = TitleBarStyle.hidden;
+    window.center();
+    window.show();
+    window.focus();
   }
   // Android and iOS need no special setup; they use native sqflite automatically.
 

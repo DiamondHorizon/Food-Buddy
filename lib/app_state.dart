@@ -333,4 +333,22 @@ class AppState extends ChangeNotifier {
     // Refresh your local inventory list so the UI reflects the subtraction
     await load();
   }
+
+  Future<void> updateIngredientQuantity(Ingredient item, String newQuantity) async {
+    if (item.id == null) return;
+
+    await IngredientDatabase.instance.updateItemQuantity(item.id!, newQuantity);
+
+    final index = ingredients.indexWhere((i) => i.id == item.id);
+    if (index != -1) {
+      ingredients[index] = Ingredient(
+        id: item.id,
+        name: item.name,
+        quantity: newQuantity,
+        expiration: item.expiration,
+        area: item.area,
+      );
+      notifyListeners();
+    }
+  }
 }

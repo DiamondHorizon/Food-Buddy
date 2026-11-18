@@ -420,7 +420,8 @@ class StorageSection extends StatelessWidget {
 
 class AddIngredientDialog extends StatefulWidget {
   final StorageArea initialArea;
-  const AddIngredientDialog({super.key, this.initialArea = StorageArea.pantry});
+  final String? initialName;
+  const AddIngredientDialog({super.key, this.initialArea = StorageArea.pantry, this.initialName});
 
   @override
   State<AddIngredientDialog> createState() => _AddIngredientDialogState();
@@ -432,6 +433,12 @@ class _AddIngredientDialogState extends State<AddIngredientDialog> {
   final _exp = TextEditingController();
   late StorageArea _area = widget.initialArea;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _name.text = widget.initialName ?? '';
+  }
 
   // Function to open the native calendar popup
   Future<void> _pickExpirationDate() async {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'ingredient_database.dart';
 import 'recipe_database.dart';
+import 'shopping_list_database.dart';
 import 'app_theme.dart';
 
 enum StorageArea { pantry, fridge, freezer }
@@ -181,9 +182,16 @@ class RecipeMatch {
   const RecipeMatch(this.recipe, this.have, this.missing);
 }
 
+class ShoppingItem {
+  final String name;
+  final bool isCustom;
+  const ShoppingItem({required this.name, required this.isCustom});
+}
+
 class AppState extends ChangeNotifier {
   List<Ingredient> ingredients = [];
   List<Recipe> recipes = [];
+  List<Map<String, dynamic>> _savedShoppingRows = [];
   bool darkMode = false;
 
   void toggleDarkMode() {
@@ -196,6 +204,7 @@ class AppState extends ChangeNotifier {
     final recipeRows = await RecipeDatabase.instance.getRecipes();
     ingredients = ingredientRows.map(Ingredient.fromMap).toList();
     recipes = recipeRows.map(Recipe.fromMap).toList();
+    _savedShoppingRows = await ShoppingListDatabase.instance.getItems();
     notifyListeners();
   }
 
@@ -229,6 +238,67 @@ class AppState extends ChangeNotifier {
       difficulty: r.difficulty.label,
     );
     await load();
+  }
+
+  List<ShoppingItem> get shoppingList {
+    final dismissedNames = <String>{};
+    final seen = <String>{};
+    final items = <ShoppingItem>[];
+
+    // Collect dismissed names and active custom items
+    for (final row in _savedShoppingRows) {
+      final name = (row['name'] as String).trim().toLowerCase();
+      final isDismissed = row['dismissed'] == 1;
+      final isCustom = row['isCustom'] == 1;
+
+      if (isDismissed) {
+        dismissedNames.add(name);
+      } else if (isCustom && seen.add(name)) {
+        items.add(ShoppingItem(name: name, isCustom: true));
+      }
+    }
+
+    // Append missing ingredients from recommended recipes (unless dismissed or already listed)
+    for (final match in recommendations()) {
+      for (final missingIng in match.missing) {
+        final normalized = missingIng.trim().toLowerCase();
+        if (normalized.isNotEmpty &&
+            !dismissedNames.contains(normalized) &&
+            seen.add(normalized)) {
+          items.add(ShoppingItem(name: missingIng, isCustom: false));
+        }
+      }
+    }
+
+    return items;
+  }
+
+  Future<void> addCustomShoppingItem(String name) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return;
+    await ShoppingListDatabase.instance.upsertItem(
+      trimmed,
+      isCustom: true,
+      dismissed: false,
+    );
+    _savedShoppingRows = await ShoppingListDatabase.instance.getItems();
+    notifyListeners();
+  }
+
+  Future<void> dismissShoppingItem(String name) async {
+    await ShoppingListDatabase.instance.upsertItem(
+      name,
+      isCustom: false,
+      dismissed: true,
+    );
+    _savedShoppingRows = await ShoppingListDatabase.instance.getItems();
+    notifyListeners();
+  }
+
+  Future<void> resetDismissedShoppingItems() async {
+    await ShoppingListDatabase.instance.clearDismissed();
+    _savedShoppingRows = await ShoppingListDatabase.instance.getItems();
+    notifyListeners();
   }
 
   Future<void> toggleFavorite(Recipe r) async {
@@ -388,5 +458,19 @@ class AppState extends ChangeNotifier {
       );
       notifyListeners();
     }
+  }
+
+  Future<void> addMissingIngredientsToShoppingList(List<String> names) async {
+    for (final name in names) {
+      final trimmed = name.trim();
+      if (trimmed.isEmpty) continue;
+      await ShoppingListDatabase.instance.upsertItem(
+        trimmed,
+        isCustom: true,
+        dismissed: false,
+      );
+    }
+    _savedShoppingRows = await ShoppingListDatabase.instance.getItems();
+    notifyListeners();
   }
 }

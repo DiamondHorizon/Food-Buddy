@@ -854,6 +854,25 @@ class RecipeDetailDialog extends StatelessWidget {
         ),
       ),
       actions: [
+        if (match.missing.isNotEmpty)
+          OutlinedButton.icon(
+            onPressed: () async {
+              final count = match.missing.length;
+              await state.addMissingIngredientsToShoppingList(match.missing);
+
+              if (!context.mounted) return;
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Added $count missing ${count == 1 ? 'ingredient' : 'ingredients'} to shopping list.',
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(Icons.add_shopping_cart),
+            label: Text('Add ${match.missing.length} missing to list'),
+          ),
         FilledButton.icon(
           onPressed: () async {
             // Await the inventory deduction

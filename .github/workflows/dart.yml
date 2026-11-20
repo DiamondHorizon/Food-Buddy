@@ -1,0 +1,87 @@
+name: iOS-ipa-build
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: 'minor'
+
+jobs:
+  build-ios:
+    name: 🎉 iOS Build
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history to read existing tags
+
+      - name: Bump version & create tag
+        id: bump
+        run: |
+          # Get the latest tag (e.g. "v1.2.3")
+          LATEST_TAG=$(git tag --sort=-v:refname | head -n 1)
+
+          if [ -z "$LATEST_TAG" ]; then
+            # No tags yet — start at v0.1.0
+            MAJOR=0; MINOR=1; PATCH=0
+          else
+            # Strip leading "v" and split
+            VERSION="${LATEST_TAG#v}"
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          fi
+
+          # Bump based on input
+          case "${{ inputs.bump }}" in
+            major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+            minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+            patch) PATCH=$((PATCH + 1)) ;;
+          esac
+
+          NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "new_tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
+          echo "Creating tag: $NEW_TAG"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$NEW_TAG"
+          git push origin "$NEW_TAG"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          architecture: x64
+
+      - run: flutter pub get
+
+      - run: pod repo update
+        working-directory: ios
+
+      - run: flutter build ios --release --no-codesign
+
+      - run: mkdir Payload
+        working-directory: build/ios/iphoneos
+
+      - run: mv Runner.app/ Payload
+        working-directory: build/ios/iphoneos
+
+      - name: Zip output
+        run: zip -qq -r -9 FlutterIpaExport.ipa Payload
+        working-directory: build/ios/iphoneos
+
+      - name: Upload to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/ios/iphoneos/FlutterIpaExport.ipa
+          tag: ${{ steps.bump.outputs.new_tag }}
+          overwrite: true
+          body: "Release ${{ steps.bump.outputs.new_tag }}"

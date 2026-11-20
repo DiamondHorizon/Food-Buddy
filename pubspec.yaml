@@ -38,9 +38,9 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^2.0.0
-  window_manager: ^0.6.0
-  flutter_svg: ^2.3.0
-  share_plus: ^10.1.4
+  window_manager: ^0.7.0
+  flutter_svg: ^2.5.0
+  share_plus: ^13.3.1
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +52,21 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/food_buddy_app_icon.png"
+  windows:
+    generate: true
+    image_path: "assets/icons/food_buddy_app_icon.png"
+  macos:
+    generate: true
+    image_path: "assets/icons/food_buddy_app_icon.png"
+  web:
+    generate: true
+    image_path: "assets/icons/food_buddy_app_icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
